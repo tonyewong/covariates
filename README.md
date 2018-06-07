@@ -12,7 +12,7 @@ Subtract moving window 1-year mean, etc TODO
 
 Threshold selection, etc
 
-New data set for each year between 30 years and full data.
+New data set for each interval `dyear` between 30 years and full data.  Do not use each year because some years will have 0 exceedances.  Instead, calculate the minimum number of years (integer) so that each added block will add at least one data point.
 
 ### 2 Prior distributions
 
