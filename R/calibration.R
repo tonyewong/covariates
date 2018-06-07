@@ -173,7 +173,7 @@ accept_mcmc <- accept_mcmc_many + (accept_mcmc_few - accept_mcmc_many)/length(pa
 step_mcmc <- as.numeric(0.05*apply(X=mle.fits$gpd3, MARGIN=2, FUN=sd))
 
 for (data.exp in data.experiments) {
-  print(paste('Starting preliminary calibration for experiment ',data.exp,'/',n.experiments,' -- ', nnode_mcmc,' cores x ',niter_mcmc,' iterations)...', sep=''))
+  print(paste('Starting preliminary calibration for experiment ',data.exp,': ',match(data.exp, data.experiments),'/',n.experiments,' -- ', nnode_mcmc,' cores x ',niter_mcmc,' iterations)...', sep=''))
   tbeg=proc.time()
   amcmc_prelim[[data.exp]] = MCMC(log_post_ppgpd, niter_mcmc, initial.values,
                               adapt=TRUE, acc.rate=accept_mcmc, scale=step_mcmc,
@@ -210,7 +210,7 @@ accept_mcmc <- accept_mcmc_many + (accept_mcmc_few - accept_mcmc_many)/length(pa
 amcmc_out <- vector('list', n.experiments); names(amcmc_out) <- data.experiments
 
 for (data.exp in data.experiments) {
-  print(paste('Starting production calibration for experiment ',data.exp,'/',n.experiments,' -- ', nnode_mcmc,' cores x ',niter_mcmc,' iterations)...', sep=''))
+  print(paste('Starting production calibration for experiment ',data.exp,': ',match(data.exp, data.experiments),'/',n.experiments,' -- ', nnode_mcmc,' cores x ',niter_mcmc,' iterations)...', sep=''))
   initial_parameters <- amcmc_prelim[[data.exp]]$samples[amcmc_prelim[[data.exp]]$n.sample,]
   step_mcmc <- amcmc_prelim[[data.exp]]$cov.jump
   tbeg <- proc.time()
