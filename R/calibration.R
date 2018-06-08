@@ -36,7 +36,7 @@ filename.datacalib <- "../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-
 
 niter_mcmc_prelim000 <- 5e3      # number of MCMC iterations (PRELIMINARY chains)
 nnode_mcmc_prelim000 <- 1        # number of CPUs to use (PRELIMINARY chains)
-niter_mcmc_prod000 <- 5e3        # number of MCMC iterations (PRODUCTION chains)
+niter_mcmc_prod000 <- 1e5        # number of MCMC iterations (PRODUCTION chains)
 #nnode_mcmc_prod000 <- 10          # number of CPUs to use (PRODUCTION chains)
 gamma_mcmc000 <- 0.5             # speed of adaptation (0.5=faster, 1=slowest)
 
@@ -314,7 +314,6 @@ for (p in 1:length(parnames)) {
 hw.diag <- vector('list', n.experiments); names(hw.diag) <- data.experiments
 for (data.exp in data.experiments) {
   hw.diag[[data.exp]] <- heidel.diag(as.mcmc(amcmc_out[[data.exp]][[1]]$samples), eps=0.1, pvalue=0.05)
-  }
 }
 
 #
