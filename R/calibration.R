@@ -335,7 +335,7 @@ for (data.exp in data.experiments) {
     ifirst[[data.exp]] <- round(0.5*niter_mcmc)
   } else {
     for (i in seq(from=length(niter.test), to=1, by=-1)) {
-      if( all(gr.test[[data.exp]][i:length(lgr)] < gr.max) ) {ifirst[[data.exp]] <- niter.test[i]}
+      if( all(gr.test[[data.exp]][i:length(niter.test)] < gr.max) ) {ifirst[[data.exp]] <- niter.test[i]}
     }
   }
 }

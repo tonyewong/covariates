@@ -14,9 +14,11 @@ Threshold selection, etc
 
 New data set for each interval `dyear` between 30 years and full data.  Do not use each year because some years will have 0 exceedances.  Instead, calculate the minimum number of years (integer) so that each added block will add at least one data point.
 
+Leads to `dyear` of 3 years.  Start with 11 years of data, even though most people would never use that to estimate, because we want to see!  And we can hit 137 or 89 years of data (Delfzijl or Norfolk, respectively) in multiples of 3 years.
+
 ### 2 Prior distributions
 
-Using only stationary GPD, priors by 
+Using only stationary GPD, priors by
 
 ### 3 Calibration
 
@@ -24,7 +26,7 @@ MCMC...
 
 Key figure:  box-whisker plots of distributions across data lengths.  do as a surface, looks cool!
 
-### 4 Kolmogorov-Smirnov test 
+### 4 Kolmogorov-Smirnov test
 
 Asks the question:  are the resulting posteriors for a given return level but different data length experiment from the same distribution?
 
