@@ -18,6 +18,7 @@
 # MESS.  If not, see <http://www.gnu.org/licenses/>.
 #===============================================================================
 
+rm(list=ls())
 
 setwd('~/codes/datalengths/R')
 
@@ -39,7 +40,7 @@ site.names <- c('norfolk','delfzijl')
 # calibrated parameter sets (samples; all should be same size)
 # these are the results from 'calibration_dayPOT-experiments_driver.R'
 filename.normalgamma <- vector('list', length(site.names)); names(filename.normalgamma) <- site.names
-#filename.normalgamma$norfolk <-  paste(output.dir,'calibratedParameters_ppgpd-experiments_norfolk_normalgamma_decl3-pot99_31Mar2018.nc', sep='')
+filename.normalgamma$norfolk <-  paste(output.dir,'calibratedParameters_datalengths_norfolk_normalgamma_decl3-pot99_08Jun2018.nc', sep='')
 filename.normalgamma$delfzijl <- paste(output.dir,'calibratedParameters_datalengths_delfzijl_normalgamma_decl3-pot99_08Jun2018.nc',sep='')
 
 filename.datacalib <- "../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-annual_07Jun2018.rds"
@@ -67,7 +68,7 @@ for (site in site.names) {
 }
 
 
-# can reformat things as a matrix!
+# can reformat return levels as a matrix!
 # -> rows are different ensemble members
 # -> columns are different data length experiments
 # different matrix for each site, and for each parameter
@@ -77,23 +78,38 @@ for (site in site.names) {
 
 # calculate return levels
 
-# vectorized?
-rl20 <- vector('list', length(site.names)); names(rl20) <- site.names
+rl.years <- c(20, 100)
+rl.names <- NULL
+for (yy in rl.years) {rl.names <- c(rl.names, paste('y',yy,sep=''))}
+rl <- vector('list', length(site.names)); names(rl) <- site.names
 for (site in site.names) {
-  rl20[[site]] <- vector('list', length(parameters_posterior[[site]])); names(rl20[[site]]) <- names(parameters_posterior[[site]])
-  for (data.exp in names(parameters_posterior[[site]])) {
-    n.ensemble <- nrow(parameters_posterior[[site]][[data.exp]])
-    rl20[[site]][[data.exp]] <- rlevd(20, scale=parameters_posterior[[site]][[data.exp]][,2],
-                                             shape=parameters_posterior[[site]][[data.exp]][,3],
-                                             threshold=data_calib[[site]][[data.exp]]$threshold,
-                                             type='GP', npy=365.25,
-                                             rate=parameters_posterior[[site]][[data.exp]][,1])
+  rl[[site]] <- vector('list', length(rl.names))
+  names(rl[[site]]) <- rl.names
+}
+
+for (site in site.names) {
+  for (yy in 1:length(rl.years)) {
+    # initialize return levels matrix with # ensemble members rows and # data length experiment columns
+    rl[[site]][[yy]] <- mat.or.vec(nrow(parameters_posterior[[site]][[1]]), length(parameters_posterior[[site]]))
+    colnames(rl[[site]][[yy]]) <- names(parameters_posterior[[site]])
+    for (data.exp in names(parameters_posterior[[site]])) {
+      rl[[site]][[yy]][, data.exp] <- rlevd(rl.years[yy], scale=parameters_posterior[[site]][[data.exp]][,2],
+                                            shape=parameters_posterior[[site]][[data.exp]][,3],
+                                            threshold=data_calib[[site]][[data.exp]]$threshold,
+                                            type='GP', npy=365.25,
+                                            rate=parameters_posterior[[site]][[data.exp]][,1])
+    }
   }
 }
 
 
-# example
-ks.test(c(rl20$delfzijl$y137,rl20$delfzijl$y134,rl20$delfzijl$y131), c(rl20$delfzijl$y122) )
+# examples
+ks.test(rl$norfolk$y20[,'y89'], rl$norfolk$y20[,'y86'])
+
+
+
+library(fitdistrplus)
+tmp <- fitdist(rl20$delfzijl$y137, "lnorm", start = c(meanlog=0, sdlog=1))
 
 #===============================================================================
 # End
