@@ -18,7 +18,8 @@ print(paste('saving intermediate progress into file:',filename.saveprogress))
 #=== read in tide gauge data
 #===
 
-data <- read.table('../data/id1-DELFZL-187901010000-201607072359_reduced.csv', header = TRUE, sep=',')
+#data <- read.table('../data/id1-DELFZL-187901010000-201607072359_reduced.csv', header = TRUE, sep=',')
+data <- read.table('../../EVT/data/id1-DELFZL-187901010000-201607072359_reduced.csv', header = TRUE, sep=',')
 names(data)[1:3] <- c('date','time','sl')
 data$sl <- data$sl*10 # convert to mm from cm
 
