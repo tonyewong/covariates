@@ -112,5 +112,45 @@ library(fitdistrplus)
 tmp <- fitdist(rl20$delfzijl$y137, "lnorm", start = c(meanlog=0, sdlog=1))
 
 #===============================================================================
+#===============================================================================
+
+data_gpd <- readRDS('../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-linear_10Jul2018.rds')
+
+years_norfolk <- rep(NA, length(data_gpd$norfolk))
+threshold_norfolk <- rep(NA, length(data_gpd$norfolk))
+for (yy in 1:length(data_gpd$norfolk)) {
+  years_norfolk[yy] <- length(data_gpd$norfolk[[yy]]$year)
+  threshold_norfolk[yy] <- data_gpd$norfolk[[yy]]$threshold
+}
+threshold0_norfolk <- threshold_norfolk[length(threshold_norfolk)]
+relerr_norfolk <- (threshold_norfolk - threshold0_norfolk)/threshold0_norfolk
+
+years_delfzijl <- rep(NA, length(data_gpd$delfzijl))
+threshold_delfzijl <- rep(NA, length(data_gpd$delfzijl))
+for (yy in 1:length(data_gpd$delfzijl)) {
+  years_delfzijl[yy] <- length(data_gpd$delfzijl[[yy]]$year)
+  threshold_delfzijl[yy] <- data_gpd$delfzijl[[yy]]$threshold
+}
+threshold0_delfzijl <- threshold_delfzijl[length(threshold_delfzijl)]
+relerr_delfzijl <- (threshold_delfzijl - threshold0_delfzijl)/threshold0_delfzijl
+
+# relative error to plot
+re <- 0.01
+
+par(mfrow=c(2,1))
+
+plot(years_norfolk, relerr_norfolk, pch=4, ylim=c(-.05,.05),
+     xlab='Years of data', ylab='RE', main='Norfolk')
+lines(c(0,140),c(0,0), lty=1, col='red')
+lines(c(0,140),c(re, re), lty=2, col='red')
+lines(c(0,140),-c(re, re), lty=2, col='red')
+
+plot(years_delfzijl, relerr_delfzijl, pch=4, ylim=c(-.05,.05),
+     xlab='Years of data', ylab='RE', main='delfzijl')
+lines(c(0,140),c(0,0), lty=1, col='red')
+lines(c(0,140),c(re, re), lty=2, col='red')
+lines(c(0,140),-c(re, re), lty=2, col='red')
+
+#===============================================================================
 # End
 #===============================================================================

@@ -81,88 +81,31 @@ igap <- which(time.diff > (one.hours+10/(24*60*60)))
 
 print(paste('Detrending using method `',detrend.method,'` ...', sep=''))
 
-if (detrend.method=='linear') {
+# what the years in which we have data?
+dates.new <- date.mdy(data$time.days)
+years.unique <- unique(dates.new$year)
 
-  # calculate monthly means
+# get a placeholder
+data$sl.detrended <- data$sl
+time.days.beg <- min(data$time.days)
+time.days.end <- max(data$time.days)
 
-  dates.new <- date.mdy(data$time.days)
-  date.beg <- date.mdy(min(data$time.days))
-  date.end <- date.mdy(max(data$time.days))
-
-  # what the years in which we have data?
-  years.unique <- unique(dates.new$year)
-
-  # in each year, what are the months with at least 90% of the data?
-  months.this.year <- vector('list', length(years.unique))
-  names(months.this.year) <- years.unique
-  years.to.remove <- NULL
-  for (year in years.unique) {
-    ind.this.year <- which(dates.new$year == year)
-    months.to.keep <- NULL
-    for (month in 1:12) {
-      ind.this.month <- which(dates.new$month[ind.this.year] == month)
-      days.this.month <- monthDays(paste(year,'-',month,'-','1', sep=''))
-      hours.this.month <- days.this.month * 24
-      perc.data.this.month <- length(ind.this.month)/hours.this.month
-      if (perc.data.this.month >= 0.9) {months.to.keep <- c(months.to.keep, month)}
-    }
-    if(length(months.to.keep)>0) {months.this.year[[year]] <- months.to.keep }
-    else                         {years.to.remove <- c(years.to.remove, year)}
+pb <- txtProgressBar(min=0,max=length(data$time.days),initial=0,style=3)
+for (tt in 1:length(data$time.days)) {
+  # if within half a year of either end of the time series, include either the
+  # entire first year or entire last year to get a full year's worth of data in
+  # the subtracted mean
+  if (data$time.days[tt] - time.days.beg < (365.25*0.5)) {
+    ind.close <- which(data$time.days - time.days.beg <= 365.25)
+  } else if(time.days.end - data$time.days[tt] < (365.25*0.5)) {
+    ind.close <- which(time.days.end - data$time.days <= 365.25)
+  } else {
+    ind.close <- which(abs(data$time.days-data$time.days[tt]) <= (365.25*0.5) )
   }
-  if(length(years.to.remove)>0) {years.unique <- years.unique[-match(years.to.remove, years.unique)]}
-
-  # get the mean time (in days releative to 1 Jan 1960) of the observations of
-  # each month we are using to fit the trend for SLR
-  times.month <- rep(NA, length(unlist(months.this.year)))
-  sl.month    <- rep(NA, length(unlist(months.this.year)))
-  cnt <- 1
-  for (year in years.unique) {
-    ind.this.year <- which(dates.new$year == year)
-    for (month in months.this.year[[year]]) {
-      ind.this.month <- which(dates.new$month[ind.this.year] == month)
-      times.month[cnt] <- mean(data$time.days[ind.this.year[ind.this.month]])
-      sl.month[cnt]    <- mean(data$sl[ind.this.year[ind.this.month]])
-      cnt <- cnt + 1
-    }
-  }
-
-  # fit trend
-  slr.trend <- lm(sl.month ~ times.month)
-  slr.trend.1hour <- slr.trend$coefficients[1] + slr.trend$coefficients[2]*data$time.days
-
-  # subtract off from the 1-hourly data
-  data$sl.detrended <- data$sl - slr.trend.1hour
-
-} else if(detrend.method=='annual') {
-
-  # what the years in which we have data?
-  dates.new <- date.mdy(data$time.days)
-  years.unique <- unique(dates.new$year)
-
-  # get a placeholder
-  data$sl.detrended <- data$sl
-  time.days.beg <- min(data$time.days)
-  time.days.end <- max(data$time.days)
-
-  pb <- txtProgressBar(min=0,max=length(data$time.days),initial=0,style=3)
-  for (tt in 1:length(data$time.days)) {
-    # if within half a year of either end of the time series, include either the
-    # entire first year or entire last year to get a full year's worth of data in
-    # the subtracted mean
-    if (data$time.days[tt] - time.days.beg < (365.25*0.5)) {
-      ind.close <- which(data$time.days - time.days.beg <= 365.25)
-    } else if(time.days.end - data$time.days[tt] < (365.25*0.5)) {
-      ind.close <- which(time.days.end - data$time.days <= 365.25)
-    } else {
-      ind.close <- which(abs(data$time.days-data$time.days[tt]) <= (365.25*0.5) )
-    }
-    data$sl.detrended[tt] <- data$sl[tt] - mean(data$sl[ind.close])
-    setTxtProgressBar(pb, tt)
-  }
-  close(pb)
-} else {
-  print('ERROR: unknown detrend.method value')
+  data$sl.detrended[tt] <- data$sl[tt] - mean(data$sl[ind.close])
+  setTxtProgressBar(pb, tt)
 }
+close(pb)
 
 print('  ... done.')
 

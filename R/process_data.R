@@ -58,7 +58,7 @@ library(doParallel)
 #===============================================================================
 
 dt.decluster <- 3
-detrend.method <- 'linear'
+detrend.method <- 'annual' # MUST be annual
 pot.threshold <- 0.99
 
 source('decluster_timeseries.R') # routine for declustering time series

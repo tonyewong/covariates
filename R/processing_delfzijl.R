@@ -96,89 +96,31 @@ save.image(file=filename.saveprogress)
 
 print(paste('Detrending using method `',detrend.method,'` ...', sep=''))
 
-if (detrend.method=='linear') {
+# what the years in which we have data?
+dates.new <- date.mdy(time_3hour)
+years.unique <- unique(dates.new$year)
 
-  # calculate monthly means
+# get a placeholder -- want to be using the 3-hourly time series
+sl_3hour_detrended <- sl_3hour
+time.days.beg <- min(time_3hour)
+time.days.end <- max(time_3hour)
 
-  dates.new <- date.mdy(time_3hour)
-  date.beg <- date.mdy(min(time_3hour))
-  date.end <- date.mdy(max(time_3hour))
-
-  # what the years in which we have data?
-  years.unique <- unique(dates.new$year)
-
-  # in each year, what are the months with at least 90% of the data?
-  months.this.year <- vector('list', length(years.unique))
-  names(months.this.year) <- years.unique
-  years.to.remove <- NULL
-  for (year in years.unique) {
-    ind.this.year <- which(dates.new$year == year)
-    months.to.keep <- NULL
-    for (month in 1:12) {
-      ind.this.month <- which(dates.new$month[ind.this.year] == month)
-      days.this.month <- monthDays(paste(year,'-',month,'-','1', sep=''))
-      hours.this.month <- days.this.month * 24
-      # *3 because these are 3-hourly blocks
-      perc.data.this.month <- 3*length(ind.this.month)/hours.this.month
-      if (perc.data.this.month >= 0.9) {months.to.keep <- c(months.to.keep, month)}
-    }
-    if(length(months.to.keep)>0) {months.this.year[[year]] <- months.to.keep }
-    else                         {years.to.remove <- c(years.to.remove, year)}
+pb <- txtProgressBar(min=0,max=length(time_3hour),initial=0,style=3)
+for (tt in 1:length(time_3hour)) {
+  # if within half a year of either end of the time series, include either the
+  # entire first year or entire last year to get a full year's worth of data in
+  # the subtracted mean
+  if (time_3hour[tt] - time.days.beg < (365.25*0.5)) {
+    ind.close <- which(time_3hour - time.days.beg <= 365.25)
+  } else if(time.days.end - time_3hour[tt] < (365.25*0.5)) {
+    ind.close <- which(time.days.end - time_3hour <= 365.25)
+  } else {
+    ind.close <- which(abs(time_3hour-time_3hour[tt]) <= (365.25*0.5) )
   }
-  if(length(years.to.remove)>0) {years.unique <- years.unique[-match(years.to.remove, years.unique)]}
-
-  # get the mean time (in days releative to 1 Jan 1960) of the observations of
-  # each month we are using to fit the trend for SLR
-  times.month <- rep(NA, length(unlist(months.this.year)))
-  sl.month    <- rep(NA, length(unlist(months.this.year)))
-  cnt <- 1
-  for (year in years.unique) {
-    ind.this.year <- which(dates.new$year == year)
-    for (month in months.this.year[[year]]) {
-      ind.this.month <- which(dates.new$month[ind.this.year] == month)
-      times.month[cnt] <- mean(data$time.days[ind.this.year[ind.this.month]])
-      sl.month[cnt]    <- mean(data$sl[ind.this.year[ind.this.month]])
-      cnt <- cnt + 1
-    }
-  }
-
-  # fit trend
-  slr.trend <- lm(sl.month ~ times.month)
-  slr.trend.3hour <- slr.trend$coefficients[1] + slr.trend$coefficients[2]*data$time.days
-
-  # subtract off from the 1-hourly data
-  data$sl.detrended <- data$sl - slr.trend.3hour
-
-} else if(detrend.method=='annual') {
-
-  # what the years in which we have data?
-  dates.new <- date.mdy(time_3hour)
-  years.unique <- unique(dates.new$year)
-
-  # get a placeholder -- want to be using the 3-hourly time series
-  sl_3hour_detrended <- sl_3hour
-  time.days.beg <- min(time_3hour)
-  time.days.end <- max(time_3hour)
-
-  pb <- txtProgressBar(min=0,max=length(time_3hour),initial=0,style=3)
-  for (tt in 1:length(time_3hour)) {
-    # if within half a year of either end of the time series, include either the
-    # entire first year or entire last year to get a full year's worth of data in
-    # the subtracted mean
-    if (time_3hour[tt] - time.days.beg < (365.25*0.5)) {
-      ind.close <- which(time_3hour - time.days.beg <= 365.25)
-    } else if(time.days.end - time_3hour[tt] < (365.25*0.5)) {
-      ind.close <- which(time.days.end - time_3hour <= 365.25)
-    } else {
-      ind.close <- which(abs(time_3hour-time_3hour[tt]) <= (365.25*0.5) )
-    }
-    sl_3hour_detrended[tt] <- sl_3hour[tt] - mean(sl_3hour[ind.close])
-    setTxtProgressBar(pb, tt)
-  }
-  close(pb)
-} else {
-  print('ERROR: unknown detrend.method value')
+  sl_3hour_detrended[tt] <- sl_3hour[tt] - mean(sl_3hour[ind.close])
+  setTxtProgressBar(pb, tt)
 }
+close(pb)
 
 print('  ... done.')
 
@@ -190,19 +132,24 @@ save.image(file=filename.saveprogress)
 #===
 
 # how many days in each year have at least 90% of their values?
-days.all <- floor(data$time.days)
+days.all <- floor(time_3hour)
 days.unique <- unique(days.all)
 ind.days.to.remove <- NULL
 print('... filtering down to do a daily maxima time series of only the days with at least 90% of data ...')
 pb <- txtProgressBar(min=min(days.unique),max=max(days.unique),initial=0,style=3)
 for (day in days.unique) {
-  ind.today <- which(floor(data$time.days) == day)
-  perc.data.today <- length(ind.today)/24
+  ind.today <- which(floor(time_3hour) == day)
+  # *3 because 3-hourly series instead of 1-hourly
+  perc.data.today <- 3*length(ind.today)/24
   if(perc.data.today < 0.9) {ind.days.to.remove <- c(ind.days.to.remove, match(day, days.unique))}
   setTxtProgressBar(pb, day)
 }
 close(pb)
-days.daily.max <- days.unique[-ind.days.to.remove]
+if(length(ind.days.to.remove)>0) {
+  days.daily.max <- days.unique[-ind.days.to.remove]
+} else {
+  days.daily.max <- days.unique
+}
 n.days <- length(days.daily.max)
 
 # calculate the daily maximum sea levels on the days of 'days.daily.max'
@@ -213,8 +160,8 @@ pb <- txtProgressBar(min=0,max=n.days,initial=0,style=3)
 for (day in days.daily.max) {
   cnt <- match(day,days.daily.max)
   ind.today <- which(days.all == day)
-  sl.daily.max[cnt] <- max(data$sl.detrended[ind.today])
-  years.daily.max[cnt] <- data$year[ind.today][1]
+  sl.daily.max[cnt] <- max(sl_3hour_detrended[ind.today])
+  years.daily.max[cnt] <- year_3hour[ind.today][1]
   setTxtProgressBar(pb, cnt)
 }
 close(pb)
