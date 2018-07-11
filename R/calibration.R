@@ -32,7 +32,7 @@ station <- 'norfolk'             # can be 'delfzijl' or 'norfolk'
 type.of.priors <- 'normalgamma'      # can be either 'uniform' or 'normalgamma'
 pot.threshold <- 0.99            # GPD threshold (percentile, 0-1)
 dt.decluster <- 3                # declustering time-scale (days)
-filename.datacalib <- "../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-annual_07Jun2018.rds"
+filename.datacalib <- "../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-annual_10Jul2018.rds"
 
 niter_mcmc_prelim000 <- 5e3      # number of MCMC iterations (PRELIMINARY chains)
 nnode_mcmc_prelim000 <- 1        # number of CPUs to use (PRELIMINARY chains)

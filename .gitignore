@@ -1,5 +1,6 @@
+*.pdf
 *.rds
-**DS_Store
+*Store
 *.log
 *.RData
 *.nc

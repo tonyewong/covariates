@@ -114,7 +114,7 @@ tmp <- fitdist(rl20$delfzijl$y137, "lnorm", start = c(meanlog=0, sdlog=1))
 #===============================================================================
 #===============================================================================
 
-data_gpd <- readRDS('../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-linear_10Jul2018.rds')
+data_gpd <- readRDS('../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-annual_10Jul2018.rds')
 
 years_norfolk <- rep(NA, length(data_gpd$norfolk))
 threshold_norfolk <- rep(NA, length(data_gpd$norfolk))
@@ -146,10 +146,42 @@ lines(c(0,140),c(re, re), lty=2, col='red')
 lines(c(0,140),-c(re, re), lty=2, col='red')
 
 plot(years_delfzijl, relerr_delfzijl, pch=4, ylim=c(-.05,.05),
-     xlab='Years of data', ylab='RE', main='delfzijl')
+     xlab='Years of data', ylab='RE', main='Delfzijl')
 lines(c(0,140),c(0,0), lty=1, col='red')
 lines(c(0,140),c(re, re), lty=2, col='red')
 lines(c(0,140),-c(re, re), lty=2, col='red')
+
+
+
+# plot in actual sea levels
+
+#pdf(paste(plot.dir,'returnlevels_pdf_sf.pdf',sep=''),width=7,height=9.5,colormodel='rgb')
+pdf(paste('../figures/p99_datalengths.pdf',sep=''),width=4,height=5,colormodel='rgb')
+
+par(mfrow=c(2,1))
+par(mai=c(.67,.8,.25,.1))
+
+plot(years_norfolk, threshold_norfolk, pch=4, ylim=c(920,1020), xlab='', ylab='', main='', yaxt='n')
+lines(c(0,140),c(threshold0_norfolk, threshold0_norfolk), lty=1, col='red')
+mtext('Years of data', side=1, line=2, cex=1)
+mtext('99th percentile [mm]', side=2, line=2.8, cex=1)
+mtext('Norfolk', side=3, line=.1, cex=1)
+#mtext(expression(bold(' c.')), side=3, line=.1, cex=0.75, adj=0)
+axis(1, at=seq(10,140,10), labels=c('10','','30','','50','','70','','90','','110','','130',''), cex.axis=1)
+axis(2, at=seq(940,1020,20), las=1, cex.axis=1, mgp=c(3,.7,0))
+
+par(mai=c(.67,.8,.25,.1))
+
+plot(years_delfzijl, threshold_delfzijl, pch=4, ylim=c(2380,2580), xlab='', ylab='', main='', yaxt='n')
+lines(c(0,140),c(threshold0_delfzijl, threshold0_delfzijl), lty=1, col='red')
+mtext('Years of data', side=1, line=2, cex=1)
+mtext('99th percentile [mm]', side=2, line=2.8, cex=1)
+mtext('Delfzijl', side=3, line=.1, cex=1)
+#mtext(expression(bold(' c.')), side=3, line=.1, cex=0.75, adj=0)
+axis(1, at=seq(10,140,10), labels=c('10','','30','','50','','70','','90','','110','','130',''), cex.axis=1)
+axis(2, at=seq(2380,2580,40), las=1, cex.axis=1, mgp=c(3,.7,0))
+
+dev.off()
 
 #===============================================================================
 # End
