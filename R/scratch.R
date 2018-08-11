@@ -40,10 +40,10 @@ site.names <- c('norfolk','delfzijl')
 # calibrated parameter sets (samples; all should be same size)
 # these are the results from 'calibration_dayPOT-experiments_driver.R'
 filename.normalgamma <- vector('list', length(site.names)); names(filename.normalgamma) <- site.names
-filename.normalgamma$norfolk <-  paste(output.dir,'calibratedParameters_datalengths_norfolk_normalgamma_decl3-pot99_08Jun2018.nc', sep='')
+filename.normalgamma$norfolk <-  paste(output.dir,'calibratedParameters_datalengths_norfolk_normalgamma_decl3-pot99_10Jul2018.nc', sep='')
 filename.normalgamma$delfzijl <- paste(output.dir,'calibratedParameters_datalengths_delfzijl_normalgamma_decl3-pot99_08Jun2018.nc',sep='')
 
-filename.datacalib <- "../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-annual_07Jun2018.rds"
+filename.datacalib <- "../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-annual_10Jul2018.rds"
 filename.priors <- '../data/surge_priors_normalgamma_ppgpd_decl3-pot99_28Mar2018.rds'
 
 # file to save progress as you run
@@ -51,6 +51,19 @@ filename.saveprogress <- '../output/analysis_inprogress.RData'
 
 # can get all experiment names from calibration data
 data_calib <- readRDS(filename.datacalib)
+
+# total number of experiments for each
+nyears <- c(length(data_calib$norfolk), length(data_calib$delfzijl))
+names(nyears) <- site.names
+
+# number of years in each experiment for each
+years <- vector('list', length(site.names)); names(years) <- site.names
+for (site in site.names) {
+  years[[site]] <- rep(NA, length(data_calib[[site]]))
+  for (y in 1:length(data_calib[[site]])) {
+    years[[site]][y] <- as.numeric(substr(names(data_calib[[site]])[y], 2, nchar(names(data_calib[[site]])[y])))
+  }
+}
 
 # read results for posterior parameters, across both sites and all data lengths
 
@@ -66,7 +79,6 @@ for (site in site.names) {
     parameters_posterior[[site]][[data.exp]] <- t(ncvar_get(ncdata, paste('parameters.',data.exp,sep='')))
   }
 }
-
 
 # can reformat return levels as a matrix!
 # -> rows are different ensemble members
@@ -101,6 +113,64 @@ for (site in site.names) {
     }
   }
 }
+
+q20.norfolk <- mat.or.vec(ncol(rl$norfolk$y20), 3)
+q100.norfolk <- mat.or.vec(ncol(rl$norfolk$y100), 3)
+for (y in 1:ncol(rl$norfolk$y20)) {
+  q20.norfolk[y,] <- quantile(rl$norfolk$y20[,y], c(.05,.5,.95))
+  q100.norfolk[y,] <- quantile(rl$norfolk$y100[,y], c(.05,.5,.95))
+}
+
+
+plot(seq(10,89), q20.norfolk[,1], type='l', lty=2, ylim=c(1400,3500),
+     xlab='Years of data', ylab='20-year Return level (mm)')
+lines(seq(10,89), q20.norfolk[,3], type='l', lty=2)
+lines(seq(10,89), q20.norfolk[,2], type='l', lty=1)
+
+
+# chi-squared test?
+p.chi2 <- rep(NA, ncol(rl$norfolk$y20))
+for (y in 1:ncol(rl$norfolk$y20)) {
+  p.chi2[y] <- chisq.test(sort(rl$norfolk$y20[,y]), sort(rl$norfolk$y20[,80]))$p.value
+}
+
+# rank sums test?
+
+# using subsets?
+n_sample <- 100
+x_baseline <- sample(rl$norfolk$y100[,nyears['norfolk']], size=n_sample, replace=FALSE)
+
+pvals <- rep(NA, nyears['norfolk'])
+for (y in 1:nyears['norfolk']) {
+  x_test <- sample(rl$norfolk$y100[,y], size=n_sample, replace=FALSE)
+  pvals[y] <- wilcox.test(x_test, x_baseline)$p.value
+}
+
+# KDE for the distribution of return levels using all of the data, then get
+# p-value = the joint probability of seeing the return levels in some data subset
+# experiment, if they came from the one using all data (null hypothesis)
+
+# break up into control and validation groups?
+
+kde0 <- density(rl$norfolk$y100[,80])
+#kdeA <- approxfun(x=kde0$x, y=kde0$y, yleft=0, yright=0, method="linear")
+igood <- which(kde0$y > 0)
+kdeA <- approxfun(x=kde0$x[igood], y=kde0$y[igood], method="linear", rule=1)
+
+n_sample <- 1000
+n_good <- rep(NA, nyears['norfolk'])
+pvals <- rep(NA, nyears['norfolk'])
+for (y in 1:nyears['norfolk']) {
+  probs <- kdeA( sample(rl$norfolk$y100[,y], size=n_sample, replace=FALSE) )
+  pvals[y] <- sum( log( probs ), na.rm=TRUE)
+  n_good[y] <- length(!is.na(probs))
+}
+
+# get an average p-value for each year experiment
+pvals <- exp(pvals/n_good)
+
+# scale so p-value of last year is 1
+pvals <- pvals/pvals[nyears['norfolk']]
 
 
 # examples
