@@ -30,6 +30,8 @@ path.R <- '/home/scrim/axw322/codes/datalengths/R'
 
 filename.likelihood <- paste('log_marginal_likelihood',appen,'.rds',sep='')
 filename.weights <- paste('bma_weights',appen,'.rds',sep='')
+filename.likelihood_all <- paste('log_marginal_likelihood_all',appen,'.rds',sep='')
+filename.weights_all <- paste('bma_weights_all',appen,'.rds',sep='')
 
 types.of.priors <- 'normalgamma'
 
@@ -72,6 +74,7 @@ for (file in files) {
   station_name <- toString(station)
   site <- paste(toupper(substr(station_name, 1, 1)), substr(station_name, 2, nchar(station_name)), sep="")
   cc <- unlist(strsplit(file, split='_'))[4]
+  # gpd.model is on the file, so just don't mess with it!
   log.marg.lik[[site]][[cc]][[gpd.model]] <- ml[length(ml)]
 }
 
@@ -90,9 +93,59 @@ for (site in site.names) {
 saveRDS(log.marg.lik, paste(path.out,filename.likelihood, sep="/"))
 saveRDS(bma.weights, paste(path.out,filename.weights, sep="/"))
 
+
+
 #===============================================================================
 #  Now, put ALL 16 of the candidate models into the mix. How are the weights
 #  distributed among the various covariates?
+
+
+for (site in site.names) {
+
+  n_model_all <- length(names_covariates)*n_model
+  bma.weights[[site]] <- vector('list', n_model_all)
+
+  cnt <- 1
+  for (cc in names_covariates) {
+    for (model in gpd.models) {
+      name_tmp <- paste(cc,model,sep="_")
+      names(bma.weights[[site]])[cnt] <- name_tmp
+      cnt <- cnt+1
+    }
+  }
+
+  log.marg.lik[[site]] <- vector('list', n_model_all)
+  names(log.marg.lik[[site]]) <- names(bma.weights[[site]])
+}
+
+files <- list.files(path=path.ml, full.names=TRUE, recursive=FALSE)
+
+for (file in files) {
+  load(file)
+  ##site <- capitalize(toString(station))
+  station_name <- toString(station)
+  site <- paste(toupper(substr(station_name, 1, 1)), substr(station_name, 2, nchar(station_name)), sep="")
+  cc <- unlist(strsplit(file, split='_'))[4]
+  name_tmp <- paste(cc,gpd.model,sep="_")
+  log.marg.lik[[site]][[name_tmp]] <- ml[length(ml)]
+}
+
+for (site in site.names) {
+  ml <- unlist(log.marg.lik[[site]])
+  ml.scale <- ml - max(ml,na.rm=TRUE)
+  for (name_tmp in names(log.marg.lik[[site]])) {
+    if (!is.na(log.marg.lik[[site]][[name_tmp]])) {
+      bma.weights[[site]][[name_tmp]] <- exp(ml.scale[name_tmp])/sum(exp(ml.scale), na.rm=TRUE)
+    }
+  }
+}
+
+saveRDS(log.marg.lik, paste(path.out,filename.likelihood_all, sep="/"))
+saveRDS(bma.weights, paste(path.out,filename.weights_all, sep="/"))
+
+
+#> bw <- rev(sort(unlist(bma.weights)))
+#> barplot(height=bw)
 
 
 
