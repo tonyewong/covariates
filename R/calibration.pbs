@@ -5,4 +5,4 @@
 #PBS -m abe
 #PBS -M twong@psu.edu
 
-R --vanilla < /home/scrim/axw322/codes/datalengths/R/calibration.R > /home/scrim/axw322/codes/datalengths/R/calib_norfolk.log
+R --vanilla < /home/scrim/axw322/codes/datalengths/R/calibration.R > /home/scrim/axw322/codes/datalengths/R/calib_delfzijl.log

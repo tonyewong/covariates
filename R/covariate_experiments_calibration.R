@@ -32,7 +32,7 @@ dt.decluster <- 3                # declustering time-scale (days)
 
 niter_mcmc_prelim000 <- 5e3      # number of MCMC iterations (PRELIMINARY chains)
 nnode_mcmc_prelim000 <- 1        # number of CPUs to use (PRELIMINARY chains)
-niter_mcmc_prod000 <- 5e4        # number of MCMC iterations (PRODUCTION chains)
+niter_mcmc_prod000 <- 1e5        # number of MCMC iterations (PRODUCTION chains)
 #nnode_mcmc_prod000 <- 10          # number of CPUs to use (PRODUCTION chains)
 gamma_mcmc000 <- 0.66             # speed of adaptation (0.5=faster, 1=slowest)
 
@@ -155,7 +155,7 @@ startadapt_mcmc <- max(500,round(0.05*niter_mcmc))
 stopadapt_mcmc <- round(niter_mcmc*1.0)
 accept_mcmc_few <- 0.44         # optimal for only one parameter
 accept_mcmc_many <- 0.234       # optimal for many parameters
-amcmc_prelim <- vector('list', length(covariates)); names(amcmc_prelim) <- names_covariates
+amcmc_prelim <- vector('list', length(names_covariates)); names(amcmc_prelim) <- names_covariates
 for (cc in names_covariates) {amcmc_prelim[[cc]] <- vector('list', nmodel); names(amcmc_prelim[[cc]]) <- types.of.gpd}
 
 for (cc in names_covariates) {
@@ -178,7 +178,6 @@ for (cc in names_covariates) {
       tend=proc.time()
 
       print(paste('... done. Took ',round(as.numeric(tend-tbeg)[3]/60,2),' minutes', sep=''))
-    }
   }
 
 }
@@ -206,7 +205,7 @@ startadapt_mcmc <- max(500,round(0.05*niter_mcmc))
 stopadapt_mcmc <- round(niter_mcmc*1.0)
 accept_mcmc_few <- 0.44         # optimal for only one parameter
 accept_mcmc_many <- 0.234       # optimal for many parameters
-amcmc_out <- vector('list', length(covariates)); names(amcmc_out) <- names_covariates
+amcmc_out <- vector('list', length(names_covariates)); names(amcmc_out) <- names_covariates
 for (cc in names_covariates) {amcmc_out[[cc]] <- vector('list', nmodel); names(amcmc_out[[cc]]) <- types.of.gpd}
 
 for (cc in names_covariates) {

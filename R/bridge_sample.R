@@ -33,7 +33,7 @@ library(doParallel)
 library(ncdf4)
 
 appen <- '_threshold99'
-calib_date <- '11Aug2018'
+calib_date <- '12Aug2018'
 dt.decluster <- 3
 pot.threshold <- 0.99
 type.of.priors <- 'normalgamma'     # can be 'uniform' or 'normalgamma'
@@ -102,7 +102,7 @@ print(paste('Starting cluster with ',nnode,' cores', sep=''))
 registerDoParallel(cl)
 
 source('bridge_sample_functions.R')
-export.names <- c('bridge.samp.rel.err','bridge.samp.iter','recip.imp.samp','experiments','trimmed_forcing','log_post_ppgpd','log_like_ppgpd','log_prior_ppgpd','path.R','forc_max','calib_date','dt.decluster','pot.threshold','type.of.priors')
+export.names <- c('bridge.samp.rel.err','bridge.samp.iter','recip.imp.samp','experiments','log_post_ppgpd','log_like_ppgpd','log_prior_ppgpd','path.R','calib_date','dt.decluster','pot.threshold','type.of.priors')
 
 finalOutput <- foreach(ee=1:n_experiments,
                             .packages=c('mvtnorm','extRemes','ncdf4'),
@@ -198,7 +198,7 @@ finalOutput <- foreach(ee=1:n_experiments,
 
   # set auxiliary parameters as trimmed_forcing for the relevant model
   if (gpd.model == 'gpd3') {aux <- NULL
-  } else {aux <- covariates[,cc]; max_forc <- max(aux)}
+  } else {aux <- covariates[,cc]; forc_max <- max(aux)}
 
   imp.samp$log.p <- apply(imp.samp$samples, 1, log_post_ppgpd,
                           parnames=colnames(post.samp$samples),

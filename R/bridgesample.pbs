@@ -1,0 +1,8 @@
+#!/bin/bash
+#PBS -l walltime=48:00:00
+#PBS -l nodes=1:ppn=11
+#PBS -j oe
+#PBS -m abe
+#PBS -M twong@psu.edu
+
+R --vanilla < /home/scrim/axw322/codes/datalengths/R/bridge_sample.R > /home/scrim/axw322/codes/datalengths/R/logs/bridge_sample.log
