@@ -23,16 +23,17 @@
 
 library(Hmisc)
 
-appen <- '_threshold997'
-path.ml <- paste('/home/scrim/axw322/codes/EVT/output/bma',appen,sep='')
-path.out <- '/home/scrim/axw322/codes/EVT/output'
+appen <- '_threshold99'
+path.ml <- paste('/home/scrim/axw322/codes/datalengths/output/bma',appen,sep='')
+path.out <- '/home/scrim/axw322/codes/datalengths/output'
+path.R <- '/home/scrim/axw322/codes/datalengths/R'
 
 filename.likelihood <- paste('log_marginal_likelihood',appen,'.rds',sep='')
 filename.weights <- paste('bma_weights',appen,'.rds',sep='')
 
 types.of.priors <- 'normalgamma'
 
-site.names <- c('Delfzijl', 'Norfolk')
+site.names <- c('Norfolk')
 n_sites <- length(site.names)
 bma.weights <- vector('list', n_sites)
 names(bma.weights) <- site.names
@@ -44,26 +45,22 @@ names(log.marg.lik) <- site.names
 gpd.models <- c('gpd3','gpd4','gpd5','gpd6')
 n_model <- length(gpd.models)
 
-
-data.lengths <- vector('list', n_sites); names(data.lengths) <- site.names
-data.lengths$Norfolk <- c('30','50','70','89')
-data.lengths$Delfzijl <- c('30','50','70','90','110','137')
+source(paste(path.R,'get_timeseries_covariates.R',sep='/'))
 
 for (site in site.names) {
 
-  bma.weights[[site]] <- vector('list', length(data.lengths[[site]]))
-  names(bma.weights[[site]]) <- data.lengths[[site]]
+  bma.weights[[site]] <- vector('list', length(names_covariates))
+  names(bma.weights[[site]]) <- names_covariates
 
-  for (year in data.lengths[[site]]) {
-    bma.weights[[site]][[year]] <- rep(NA, n_model)
-    names(bma.weights[[site]][[year]]) <- gpd.models
+  for (cc in names_covariates) {
+    bma.weights[[site]][[cc]] <- rep(NA, n_model)
+    names(bma.weights[[site]][[cc]]) <- gpd.models
   }
-  log.marg.lik[[site]] <- vector('list', length(data.lengths[[site]]))
-  names(log.marg.lik[[site]]) <- data.lengths[[site]]
-  for (year in data.lengths[[site]]) {
-      log.marg.lik[[site]][[year]] <- rep(NA, n_model)
-      names(log.marg.lik[[site]][[year]]) <- gpd.models
-
+  log.marg.lik[[site]] <- vector('list', length(names_covariates))
+  names(log.marg.lik[[site]]) <- names_covariates
+  for (cc in names_covariates) {
+      log.marg.lik[[site]][[cc]] <- rep(NA, n_model)
+      names(log.marg.lik[[site]][[cc]]) <- gpd.models
   }
 }
 
@@ -74,18 +71,17 @@ for (file in files) {
   ##site <- capitalize(toString(station))
   station_name <- toString(station)
   site <- paste(toupper(substr(station_name, 1, 1)), substr(station_name, 2, nchar(station_name)), sep="")
-  year <- unlist(strsplit(file, split="[_. ]"))[5]
-#  data.case <- which.min(abs(as.numeric(levels(data.length)[data.length])-exp.years))]
-  log.marg.lik[[site]][[year]][[gpd.model]] <- ml[length(ml)]
+  cc <- unlist(strsplit(file, split='_'))[4]
+  log.marg.lik[[site]][[cc]][[gpd.model]] <- ml[length(ml)]
 }
 
 for (site in site.names) {
-  for (year in data.lengths[[site]]) {
-    ml <- log.marg.lik[[site]][[year]]
+  for (cc in names_covariates) {
+    ml <- log.marg.lik[[site]][[cc]]
     ml.scale <- ml - max(ml,na.rm=TRUE)
     for (model in gpd.models) {
-      if (!is.na(log.marg.lik[[site]][[year]][[model]])) {
-        bma.weights[[site]][[year]][[model]] <- exp(ml.scale[model])/sum(exp(ml.scale), na.rm=TRUE)
+      if (!is.na(log.marg.lik[[site]][[cc]][[model]])) {
+        bma.weights[[site]][[cc]][[model]] <- exp(ml.scale[model])/sum(exp(ml.scale), na.rm=TRUE)
       }
     }
   }
@@ -93,6 +89,12 @@ for (site in site.names) {
 
 saveRDS(log.marg.lik, paste(path.out,filename.likelihood, sep="/"))
 saveRDS(bma.weights, paste(path.out,filename.weights, sep="/"))
+
+#===============================================================================
+#  Now, put ALL 16 of the candidate models into the mix. How are the weights
+#  distributed among the various covariates?
+
+
 
 #===============================================================================
 # End

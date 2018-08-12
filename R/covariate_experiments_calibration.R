@@ -155,7 +155,7 @@ startadapt_mcmc <- max(500,round(0.05*niter_mcmc))
 stopadapt_mcmc <- round(niter_mcmc*1.0)
 accept_mcmc_few <- 0.44         # optimal for only one parameter
 accept_mcmc_many <- 0.234       # optimal for many parameters
-amcmc_prelim <- vector('list', length(covariates)); names(amcmc_prelim) <- covariates
+amcmc_prelim <- vector('list', length(covariates)); names(amcmc_prelim) <- names_covariates
 for (cc in names_covariates) {amcmc_prelim[[cc]] <- vector('list', nmodel); names(amcmc_prelim[[cc]]) <- types.of.gpd}
 
 for (cc in names_covariates) {
@@ -206,7 +206,7 @@ startadapt_mcmc <- max(500,round(0.05*niter_mcmc))
 stopadapt_mcmc <- round(niter_mcmc*1.0)
 accept_mcmc_few <- 0.44         # optimal for only one parameter
 accept_mcmc_many <- 0.234       # optimal for many parameters
-amcmc_out <- vector('list', length(covariates)); names(amcmc_out) <- covariates
+amcmc_out <- vector('list', length(covariates)); names(amcmc_out) <- names_covariates
 for (cc in names_covariates) {amcmc_out[[cc]] <- vector('list', nmodel); names(amcmc_out[[cc]]) <- types.of.gpd}
 
 for (cc in names_covariates) {
