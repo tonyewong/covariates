@@ -5,4 +5,4 @@
 #PBS -m abe
 #PBS -M twong@psu.edu
 
-R --vanilla < /home/scrim/axw322/codes/datalengths/R/covariate_experiments_calibration.R > /home/scrim/axw322/codes/datalengths/R/calib_covariates_norfolk.log
+R --vanilla < /home/scrim/axw322/codes/covariates/R/calibration.R > /home/scrim/axw322/codes/covariates/R/calibration.log

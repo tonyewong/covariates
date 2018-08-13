@@ -5,4 +5,4 @@
 #PBS -m abe
 #PBS -M twong@psu.edu
 
-R --vanilla < /home/scrim/axw322/codes/datalengths/R/process_data.R > /home/scrim/axw322/codes/datalengths/R/process_data.log
+R --vanilla < /home/scrim/axw322/codes/covariates/R/process_data.R > /home/scrim/axw322/codes/covariates/R/process_data.log

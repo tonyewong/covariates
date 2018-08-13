@@ -5,4 +5,4 @@
 #PBS -m abe
 #PBS -M twong@psu.edu
 
-R --vanilla < /home/scrim/axw322/codes/datalengths/R/bridge_sample.R > /home/scrim/axw322/codes/datalengths/R/logs/bridge_sample.log
+R --vanilla < /home/scrim/axw322/codes/covariates/R/bridge_sample.R > /home/scrim/axw322/codes/covariates/R/logs/bridge_sample.log
