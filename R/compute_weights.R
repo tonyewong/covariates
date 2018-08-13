@@ -6,27 +6,13 @@
 # Requires the RData files from the 'bridge_sample.R' routine as input
 #
 #===============================================================================
-# Copyright 2017 Tony Wong
-#
-# MESS is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software
-# Foundation, either version 3 of the License, or (at your option) any later
-# version.
-#
-# MESS is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# MESS.  If not, see <http://www.gnu.org/licenses/>.
-#===============================================================================
 
 library(Hmisc)
 
 appen <- '_threshold99'
-path.ml <- paste('/home/scrim/axw322/codes/datalengths/output/bma',appen,sep='')
-path.out <- '/home/scrim/axw322/codes/datalengths/output'
-path.R <- '/home/scrim/axw322/codes/datalengths/R'
+path.ml <- paste('/home/scrim/axw322/codes/covariates/output/bma',appen,sep='')
+path.out <- '/home/scrim/axw322/codes/covariates/output'
+path.R <- '/home/scrim/axw322/codes/covariates/R'
 
 filename.likelihood <- paste('log_marginal_likelihood',appen,'.rds',sep='')
 filename.weights <- paste('bma_weights',appen,'.rds',sep='')

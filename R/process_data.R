@@ -1,32 +1,17 @@
 #===============================================================================
 # process_data.R
 #
-#
 # Questions?  Tony Wong (<anthony.e.wong@colorado.edu>)
-#===============================================================================
-# Copyright 2018 Tony Wong
-#
-# MESS is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software
-# Foundation, either version 3 of the License, or (at your option) any later
-# version.
-#
-# MESS is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# MESS.  If not, see <http://www.gnu.org/licenses/>.
 #===============================================================================
 
 if(Sys.info()['user']=='tony') {
   # Tony's local machine (if you aren't me, you almost certainly need to change this...)
   machine <- 'local'
-  setwd('/Users/tony/codes/datalengths/R')
+  setwd('/Users/tony/codes/covariates/R')
 } else {
   # assume on Napa cluster
   machine <- 'remote'
-  setwd('/home/scrim/axw322/codes/datalengths/R')
+  setwd('/home/scrim/axw322/codes/covariates/R')
 }
 
 #===============================================================================
@@ -65,16 +50,10 @@ source('decluster_timeseries.R') # routine for declustering time series
 
 source('processing_norfolk.R') # yields data_norfolk
 
-source('processing_delfzijl.R') # yields data_delfzijl
-
-data_gpd <- vector('list', 2); names(data_gpd) <- c('norfolk', 'delfzijl')
-data_gpd$norfolk <- data_norfolk
-data_gpd$delfzijl <- data_delfzijl
-
 # write calibration data RDS file
 today=Sys.Date(); today=format(today,format="%d%b%Y")
-filename.output <- paste('../data/tidegauge_processed_norfolk-delfzijl_decl',dt.decluster,'-pot',pot.threshold*100,'-',detrend.method,'_',today,'.rds', sep='')
-saveRDS(data_gpd, file=filename.output)
+filename.output <- paste('../data/tidegauge_processed_norfolk_decl',dt.decluster,'-pot',pot.threshold*100,'-',detrend.method,'_',today,'.rds', sep='')
+saveRDS(data_norfolk, file=filename.output)
 
 #===============================================================================
 # End

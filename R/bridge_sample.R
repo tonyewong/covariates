@@ -9,20 +9,6 @@
 # Original codes thanks to Vivek Srikrishnan (Penn State, 2017)
 # Modified by Tony Wong (Univ of Colorado, 2018)
 #===============================================================================
-# Copyright 2017 Tony Wong
-#
-# MESS is free software: you can redistribute it and/or modify it under the
-# terms of the GNU General Public License as published by the Free Software
-# Foundation, either version 3 of the License, or (at your option) any later
-# version.
-#
-# MESS is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# MESS.  If not, see <http://www.gnu.org/licenses/>.
-#===============================================================================
 
 # import libraries
 library(mvtnorm)  # used for multivariate normal samples and densities
@@ -41,22 +27,22 @@ type.of.priors <- 'normalgamma'     # can be 'uniform' or 'normalgamma'
 if(Sys.info()['user']=='tony') {
   # Tony's local machine (if you aren't me, you almost certainly need to change this...)
   machine <- 'local'
-  setwd('/Users/tony/codes/datalengths/R')
-  path.R <- '/Users/tony/codes/datalengths/R'
+  setwd('/Users/tony/codes/covariates/R')
+  path.R <- '/Users/tony/codes/covariates/R'
   # set data and save directories
-  path.data <- '/Users/tony/codes/datalengths/data'
-  path.output <- '/Users/tony/codes/datalengths/output'
-  path.save <- paste('/Users/tony/codes/datalengths/output/bma',appen,sep='')
+  path.data <- '/Users/tony/codes/covariates/data'
+  path.output <- '/Users/tony/codes/covariates/output'
+  path.save <- paste('/Users/tony/codes/covariates/output/bma',appen,sep='')
   nnode <- 2          # number of CPUs to use
 } else {
   # assume on Napa cluster
   machine <- 'remote'
-  setwd('/home/scrim/axw322/codes/datalengths/R')
-  path.R <- '/home/scrim/axw322/codes/datalengths/R'
-  path.data <- '/home/scrim/axw322/codes/datalengths/data'
-  path.output <- '/home/scrim/axw322/codes/datalengths/output'
-  path.save <- '/home/scrim/axw322/codes/datalengths/output/bma'
-  path.save <- paste('/home/scrim/axw322/codes/datalengths/output/bma',appen,sep='')
+  setwd('/home/scrim/axw322/codes/covariates/R')
+  path.R <- '/home/scrim/axw322/codes/covariates/R'
+  path.data <- '/home/scrim/axw322/codes/covariates/data'
+  path.output <- '/home/scrim/axw322/codes/covariates/output'
+  path.save <- '/home/scrim/axw322/codes/covariates/output/bma'
+  path.save <- paste('/home/scrim/axw322/codes/covariates/output/bma',appen,sep='')
   nnode <- 10          # number of CPUs to use
 }
 
