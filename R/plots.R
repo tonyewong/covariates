@@ -9,6 +9,10 @@ setwd('Users/tony/codes/covariates/R')
 plot.dir <- '/Users/tony/codes/covariates/figures'
 
 
+# Read in previous analysis work ===============================================
+load('../output/analysis.RData')
+
+
 # Read in BMA results ==========================================================
 bma.weights.all <- readRDS('../output/bma_weights_all_threshold99.rds')
 bma.weights     <- readRDS('../output/bma_weights_threshold99.rds')
@@ -18,8 +22,17 @@ bma.weights     <- readRDS('../output/bma_weights_threshold99.rds')
 source('get_timeseries_covariates.R')
 
 
-# FIGURE ??? ===================================================================
+
+#===============================================================================
+# FIGURES
+#===============================================================================
+
+
+
+#===============================================================================
+# FIGURE ???
 # barplot of BMA weights all together
+#===============================================================================
 
 bw <- rev(sort(unlist(bma.weights.all)))
 new_names <- NULL
@@ -69,8 +82,11 @@ dev.off()
 #===============================================================================
 
 
-# FIGURE ??? ===================================================================
+
+#===============================================================================
+# FIGURE ???
 # barplot of BMA weights for each individual covariate model
+#===============================================================================
 
 site <- 'Norfolk'
 better_names <- c('ST','NS1','NS2','NS3')
@@ -116,6 +132,116 @@ for (cc in 1:length(bw_cov$nao)) {text(1.5+2*(cc-1), bw_cov$nao[cc]+0.015, paste
 dev.off()
 
 #===============================================================================
+
+
+
+#===============================================================================
+# FIGURE ???
+# Panel for each covariate, return level pdfs and boxplot beneath with quantiles
+#===============================================================================
+
+pdf(paste(plot.dir,'returnlevels_pdf_bar.pdf',sep='/'),width=7,height=5.5,colormodel='cmyk')
+par(mfrow=c(2,2), mai=c(.6,.50,.4,.1))
+yy <- 'y100'
+offset <- 0.5
+cc <- 'time' # =======================
+plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, 2.92+offset),
+     lwd=2.5, lty=1, xlab='', ylab='', xaxs='i', yaxs='i', yaxt='n', axes=FALSE, col='black')
+lines(pdf.rl[[cc]]$gpd4[[yy]]$x, offset+pdf.rl[[cc]]$gpd4[[yy]]$y, col='darkorange3', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd5[[yy]]$x, offset+pdf.rl[[cc]]$gpd5[[yy]]$y, col='mediumslateblue', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd6[[yy]]$x, offset+pdf.rl[[cc]]$gpd6[[yy]]$y, col='mediumvioletred', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd3[[yy]]$x, offset+pdf.rl[[cc]]$gpd3[[yy]]$y, col='seagreen', lwd=2, lty=4)
+y1 = c(.29, .45)
+polygon(c(q.rl[[cc]]$gpd3[[yy]][c(1,1)], q.rl[[cc]]$gpd3[[yy]][c(5,5)]), c(y1,rev(y1)), col='palegreen1', border=NA)
+polygon(c(q.rl[[cc]]$gpd3[[yy]][c(2,2)], q.rl[[cc]]$gpd3[[yy]][c(4,4)]), c(y1,rev(y1)), col='seagreen3', border=NA)
+lines(c(q.rl[[cc]]$gpd3[[yy]][3], q.rl[[cc]]$gpd3[[yy]][3]), y1, lwd=2.5, col='olivedrab')
+y2 = c(.06, .23)
+polygon(c(q.rl[[cc]]$bma[[yy]][c(1,1)], q.rl[[cc]]$bma[[yy]][c(5,5)]), c(y2,rev(y2)), col='gray60', border=NA)
+polygon(c(q.rl[[cc]]$bma[[yy]][c(2,2)], q.rl[[cc]]$bma[[yy]][c(4,4)]), c(y2,rev(y2)), col='gray30', border=NA)
+lines(c(q.rl[[cc]]$bma[[yy]][3], q.rl[[cc]]$bma[[yy]][3]), y2, lwd=2.5, col='black')
+u <- par("usr")
+arrows(u[1], u[3], u[1], .99*u[4], code = 2, length=.15, xpd = TRUE)
+mtext('Probability density', side=2, line=1, cex=1);
+mtext('Time covariate', side=3, line=.6, cex=1)
+mtext(side=3, text=expression(bold(' a.')), line=.6, cex=1, adj=0)
+mtext('100-year return level in 2016 [m]', side=1, line=2.4, cex=0.9);
+axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
+legend(2.75, 3, c('ST','NS1','NS2','NS3','BMA'), lty=c(4,2,2,2,1), cex=1, bty='n', lwd=2,
+       col=c('seagreen','darkorange3','mediumslateblue','mediumvioletred', 'black'))
+#
+cc <- 'temp' # =======================
+plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, 2.92+offset),
+     lwd=2.5, lty=1, xlab='', ylab='', xaxs='i', yaxs='i', yaxt='n', axes=FALSE, col='black')
+lines(pdf.rl[[cc]]$gpd4[[yy]]$x, offset+pdf.rl[[cc]]$gpd4[[yy]]$y, col='darkorange3', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd5[[yy]]$x, offset+pdf.rl[[cc]]$gpd5[[yy]]$y, col='mediumslateblue', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd6[[yy]]$x, offset+pdf.rl[[cc]]$gpd6[[yy]]$y, col='mediumvioletred', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd3[[yy]]$x, offset+pdf.rl[[cc]]$gpd3[[yy]]$y, col='seagreen', lwd=2, lty=4)
+y1 = c(.29, .45)
+polygon(c(q.rl[[cc]]$gpd3[[yy]][c(1,1)], q.rl[[cc]]$gpd3[[yy]][c(5,5)]), c(y1,rev(y1)), col='palegreen1', border=NA)
+polygon(c(q.rl[[cc]]$gpd3[[yy]][c(2,2)], q.rl[[cc]]$gpd3[[yy]][c(4,4)]), c(y1,rev(y1)), col='seagreen3', border=NA)
+lines(c(q.rl[[cc]]$gpd3[[yy]][3], q.rl[[cc]]$gpd3[[yy]][3]), y1, lwd=2.5, col='olivedrab')
+y2 = c(.06, .23)
+polygon(c(q.rl[[cc]]$bma[[yy]][c(1,1)], q.rl[[cc]]$bma[[yy]][c(5,5)]), c(y2,rev(y2)), col='gray60', border=NA)
+polygon(c(q.rl[[cc]]$bma[[yy]][c(2,2)], q.rl[[cc]]$bma[[yy]][c(4,4)]), c(y2,rev(y2)), col='gray30', border=NA)
+lines(c(q.rl[[cc]]$bma[[yy]][3], q.rl[[cc]]$bma[[yy]][3]), y2, lwd=2.5, col='black')
+u <- par("usr")
+arrows(u[1], u[3], u[1], .99*u[4], code = 2, length=.15, xpd = TRUE)
+mtext('Probability density', side=2, line=1, cex=1);
+mtext('Temperature covariate', side=3, line=.6, cex=1)
+mtext(side=3, text=expression(bold(' b.')), line=.6, cex=1, adj=0)
+mtext('100-year return level in 2016 [m]', side=1, line=2.4, cex=0.9);
+axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
+#
+cc <- 'sealevel' # =======================
+plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, 2.92+offset),
+     lwd=2.5, lty=1, xlab='', ylab='', xaxs='i', yaxs='i', yaxt='n', axes=FALSE, col='black')
+lines(pdf.rl[[cc]]$gpd4[[yy]]$x, offset+pdf.rl[[cc]]$gpd4[[yy]]$y, col='darkorange3', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd5[[yy]]$x, offset+pdf.rl[[cc]]$gpd5[[yy]]$y, col='mediumslateblue', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd6[[yy]]$x, offset+pdf.rl[[cc]]$gpd6[[yy]]$y, col='mediumvioletred', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd3[[yy]]$x, offset+pdf.rl[[cc]]$gpd3[[yy]]$y, col='seagreen', lwd=2, lty=4)
+y1 = c(.29, .45)
+polygon(c(q.rl[[cc]]$gpd3[[yy]][c(1,1)], q.rl[[cc]]$gpd3[[yy]][c(5,5)]), c(y1,rev(y1)), col='palegreen1', border=NA)
+polygon(c(q.rl[[cc]]$gpd3[[yy]][c(2,2)], q.rl[[cc]]$gpd3[[yy]][c(4,4)]), c(y1,rev(y1)), col='seagreen3', border=NA)
+lines(c(q.rl[[cc]]$gpd3[[yy]][3], q.rl[[cc]]$gpd3[[yy]][3]), y1, lwd=2.5, col='olivedrab')
+y2 = c(.06, .23)
+polygon(c(q.rl[[cc]]$bma[[yy]][c(1,1)], q.rl[[cc]]$bma[[yy]][c(5,5)]), c(y2,rev(y2)), col='gray60', border=NA)
+polygon(c(q.rl[[cc]]$bma[[yy]][c(2,2)], q.rl[[cc]]$bma[[yy]][c(4,4)]), c(y2,rev(y2)), col='gray30', border=NA)
+lines(c(q.rl[[cc]]$bma[[yy]][3], q.rl[[cc]]$bma[[yy]][3]), y2, lwd=2.5, col='black')
+u <- par("usr")
+arrows(u[1], u[3], u[1], .99*u[4], code = 2, length=.15, xpd = TRUE)
+mtext('Probability density', side=2, line=1, cex=1);
+mtext('Sea level covariate', side=3, line=.6, cex=1)
+mtext(side=3, text=expression(bold(' c.')), line=.6, cex=1, adj=0)
+mtext('100-year return level in 2016 [m]', side=1, line=2.4, cex=0.9);
+axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
+#
+cc <- 'nao' # =======================
+plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, 2.92+offset),
+     lwd=2.5, lty=1, xlab='', ylab='', xaxs='i', yaxs='i', yaxt='n', axes=FALSE, col='black')
+lines(pdf.rl[[cc]]$gpd4[[yy]]$x, offset+pdf.rl[[cc]]$gpd4[[yy]]$y, col='darkorange3', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd5[[yy]]$x, offset+pdf.rl[[cc]]$gpd5[[yy]]$y, col='mediumslateblue', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd6[[yy]]$x, offset+pdf.rl[[cc]]$gpd6[[yy]]$y, col='mediumvioletred', lwd=2, lty=2)
+lines(pdf.rl[[cc]]$gpd3[[yy]]$x, offset+pdf.rl[[cc]]$gpd3[[yy]]$y, col='seagreen', lwd=2, lty=4)
+y1 = c(.29, .45)
+polygon(c(q.rl[[cc]]$gpd3[[yy]][c(1,1)], q.rl[[cc]]$gpd3[[yy]][c(5,5)]), c(y1,rev(y1)), col='palegreen1', border=NA)
+polygon(c(q.rl[[cc]]$gpd3[[yy]][c(2,2)], q.rl[[cc]]$gpd3[[yy]][c(4,4)]), c(y1,rev(y1)), col='seagreen3', border=NA)
+lines(c(q.rl[[cc]]$gpd3[[yy]][3], q.rl[[cc]]$gpd3[[yy]][3]), y1, lwd=2.5, col='olivedrab')
+y2 = c(.06, .23)
+polygon(c(q.rl[[cc]]$bma[[yy]][c(1,1)], q.rl[[cc]]$bma[[yy]][c(5,5)]), c(y2,rev(y2)), col='gray60', border=NA)
+polygon(c(q.rl[[cc]]$bma[[yy]][c(2,2)], q.rl[[cc]]$bma[[yy]][c(4,4)]), c(y2,rev(y2)), col='gray30', border=NA)
+lines(c(q.rl[[cc]]$bma[[yy]][3], q.rl[[cc]]$bma[[yy]][3]), y2, lwd=2.5, col='black')
+u <- par("usr")
+arrows(u[1], u[3], u[1], .99*u[4], code = 2, length=.15, xpd = TRUE)
+mtext('Probability density', side=2, line=1, cex=1);
+mtext('NAO index covariate', side=3, line=.6, cex=1)
+mtext(side=3, text=expression(bold(' d.')), line=.6, cex=1, adj=0)
+mtext('100-year return level in 2016 [m]', side=1, line=2.4, cex=0.9);
+axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
+dev.off()
+
+#===============================================================================
+
+
 
 
 #===============================================================================
