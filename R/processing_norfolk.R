@@ -9,7 +9,6 @@
 #
 #===============================================================================
 
-
 print('starting to process Norfolk (Sewells Point) tide gauge data')
 
 #===

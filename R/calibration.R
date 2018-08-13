@@ -114,7 +114,7 @@ print('...done.')
 
 print('setting up PP-GPD model parameters from DE optimization...')
 
-source('parameter_setup_allModels.R')
+source('parameter_setup.R')
 source('likelihood_ppgpd.R')
 
 priors <- readRDS(filename.priors)
