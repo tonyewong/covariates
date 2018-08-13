@@ -11,12 +11,30 @@
 # Modified code: Tony Wong (CU Boulder) 2018
 #===============================================================================
 
+rm(list=ls())
+
 library(Hmisc)
 
 appen <- '_threshold99'
-path.ml <- paste('/home/scrim/axw322/codes/covariates/output/bma',appen,sep='')
-path.out <- '/home/scrim/axw322/codes/covariates/output'
-path.R <- '/home/scrim/axw322/codes/covariates/R'
+
+if(Sys.info()['user']=='tony') {
+  # Tony's local machine (if you aren't me, you almost certainly need to change this...)
+  machine <- 'local'
+  setwd('/Users/tony/codes/covariates/R')
+  path.ml <- paste('/Users/tony/codes/covariates/output/bma',appen,sep='')
+  path.out <- '/Users/tony/codes/covariates/output'
+  path.R <- '/Users/tony/codes/covariates/R'
+  nnode_mcmc_prod000 <- 1          # number of CPUs to use (PRODUCTION chains)
+} else {
+  # assume on Napa cluster
+  machine <- 'remote'
+  setwd('/home/scrim/axw322/codes/covariates/R')
+  path.ml <- paste('/home/scrim/axw322/codes/covariates/output/bma',appen,sep='')
+  path.out <- '/home/scrim/axw322/codes/covariates/output'
+  path.R <- '/home/scrim/axw322/codes/covariates/R'
+  nnode_mcmc_prod000 <- 10          # number of CPUs to use (PRODUCTION chains)
+}
+
 
 filename.likelihood <- paste('log_marginal_likelihood',appen,'.rds',sep='')
 filename.weights <- paste('bma_weights',appen,'.rds',sep='')
@@ -90,23 +108,31 @@ saveRDS(bma.weights, paste(path.out,filename.weights, sep="/"))
 #  distributed among the various covariates?
 
 
-for (site in site.names) {
+site <- "Norfolk"
 
-  n_model_all <- length(names_covariates)*n_model
-  bma.weights[[site]] <- vector('list', n_model_all)
+# n_model_all corrected for multiple counting of stationary model (gpd3, or ST)
+n_model_all <- length(names_covariates)*n_model - (length(names_covariates)-1)
+bma.weights[[site]] <- vector('list', n_model_all)
 
-  cnt <- 1
-  for (cc in names_covariates) {
-    for (model in gpd.models) {
+cnt <- 1
+for (cc in names_covariates) {
+  for (model in gpd.models) {
+    if (model=='gpd3') {
+      if (cc=='time') {
+        name_tmp <- paste(cc,model,sep="_")
+        names(bma.weights[[site]])[cnt] <- name_tmp
+        cnt <- cnt+1
+      }
+    } else {
       name_tmp <- paste(cc,model,sep="_")
       names(bma.weights[[site]])[cnt] <- name_tmp
       cnt <- cnt+1
     }
   }
-
-  log.marg.lik[[site]] <- vector('list', n_model_all)
-  names(log.marg.lik[[site]]) <- names(bma.weights[[site]])
 }
+
+log.marg.lik[[site]] <- vector('list', n_model_all)
+names(log.marg.lik[[site]]) <- names(bma.weights[[site]])
 
 files <- list.files(path=path.ml, full.names=TRUE, recursive=FALSE)
 
@@ -117,16 +143,14 @@ for (file in files) {
   site <- paste(toupper(substr(station_name, 1, 1)), substr(station_name, 2, nchar(station_name)), sep="")
   cc <- unlist(strsplit(file, split='_'))[4]
   name_tmp <- paste(cc,gpd.model,sep="_")
-  log.marg.lik[[site]][[name_tmp]] <- ml[length(ml)]
+  if (name_tmp %in% names(log.marg.lik[[site]])) {log.marg.lik[[site]][[name_tmp]] <- ml[length(ml)]}
 }
 
-for (site in site.names) {
-  ml <- unlist(log.marg.lik[[site]])
-  ml.scale <- ml - max(ml,na.rm=TRUE)
-  for (name_tmp in names(log.marg.lik[[site]])) {
-    if (!is.na(log.marg.lik[[site]][[name_tmp]])) {
-      bma.weights[[site]][[name_tmp]] <- exp(ml.scale[name_tmp])/sum(exp(ml.scale), na.rm=TRUE)
-    }
+ml <- unlist(log.marg.lik[[site]])
+ml.scale <- ml - max(ml,na.rm=TRUE)
+for (name_tmp in names(log.marg.lik[[site]])) {
+  if (!is.na(log.marg.lik[[site]][[name_tmp]])) {
+    bma.weights[[site]][[name_tmp]] <- exp(ml.scale[name_tmp])/sum(exp(ml.scale), na.rm=TRUE)
   }
 }
 

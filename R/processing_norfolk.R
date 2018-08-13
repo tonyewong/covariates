@@ -225,6 +225,8 @@ filename.output <- paste('../data/tidegauge_processed_norfolk_decl',dt.decluster
 print(paste('Saving processed data to file:',filename.output))
 saveRDS(data_norfolk, file=filename.output)
 
+save.image('processing_norfolk.RData')
+
 #===============================================================================
 
 print('done processing the Sewells Point/Norfolk tide gauge data set')
