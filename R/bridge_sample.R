@@ -6,8 +6,8 @@
 # This revised version calculates all likelihood estimates as a parallel
 # 'foreach' loop.
 #
-# Original codes thanks to Vivek Srikrishnan (Penn State, 2017)
-# Modified by Tony Wong (Univ of Colorado, 2018)
+# Original code: Vivek Srikrishnan (Penn State) 2017
+# Modified code: Tony Wong (CU Boulder) 2018
 #===============================================================================
 
 # import libraries

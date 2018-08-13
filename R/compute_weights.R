@@ -1,10 +1,14 @@
 #===============================================================================
+# compute_weights.R
+#
 # This file reads in the output files from the marginal likelihood estimator
 # for each model and combines them into a combined .RDS file with bma weights
 # and marginal likelihoods.
 #
 # Requires the RData files from the 'bridge_sample.R' routine as input
 #
+# Original code: Vivek Srikrishnan (Penn State) 2017
+# Modified code: Tony Wong (CU Boulder) 2018
 #===============================================================================
 
 library(Hmisc)
@@ -128,71 +132,6 @@ for (site in site.names) {
 
 saveRDS(log.marg.lik, paste(path.out,filename.likelihood_all, sep="/"))
 saveRDS(bma.weights, paste(path.out,filename.weights_all, sep="/"))
-
-
-# a bit more exploratory analysis and draft plotting ===========================
-if(FALSE) {
-
-bw <- rev(sort(unlist(bma.weights)))
-new_names <- NULL
-for (i in 1:length(bw)) {
-  cc_mod <- unlist(strsplit(names(bw)[i], split="[.]"))[3]
-  cc_mod <- unlist(strsplit(cc_mod, split="[_]"))
-  cc <- capitalize(cc_mod[1])
-  if (cc=='Nao') {cc <- 'NAO'} else if (cc=='Sealevel') {cc <- 'Sea level'} else if (cc=='Temp') {cc <- 'Temperature'}
-  mod <- cc_mod[2]
-  if (mod=='gpd3') {mod <- 'ST'} else if (mod=='gpd4') {mod <- 'NS1'} else if (mod=='gpd5') {mod <- 'NS2'} else if (mod=='gpd6') {mod <- 'NS3'}
-  new_names <- c(new_names, paste(cc,mod, sep=', '))
-}
-names(bw) <- new_names
-
-
-# get totals for each covariate type:
-bw_totals <- rep(0, length(names_covariates)); names(bw_totals) <- names_covariates
-for (cc in names(bw)) {
-  if (grepl('Time', cc)) {bw_totals['time'] <- bw_totals['time'] + bw[cc]
-  } else if (grepl('Sea', cc)) {bw_totals['sea'] <- bw_totals['sea'] + bw[cc]
-  } else if (grepl('Temp', cc)) {bw_totals['temp'] <- bw_totals['temp'] + bw[cc]
-  } else if (grepl('NAO', cc)) {bw_totals['nao'] <- bw_totals['nao'] + bw[cc]
-  }
-}
-#> bw_totals
-#      time       temp   sealevel        nao
-#0.09128698 0.29934667 0.43283316 0.17653319
-
-
-par(las=1, mai=c(1,1.5,.2,.2))
-barplot(bw, horiz=TRUE, names.arg=new_names, xlab='BMA weight')
-
-
-#==========
-# individual covariates
-bma_weights <- readRDS('../output/bma_weights_threshold99.rds')
-
-site <- 'Norfolk'
-better_names <- c('ST','NS1','NS2','NS3')
-covar_names <- c('Time', 'Temperature','Sea level', 'NAO'); names(covar_names) <- names_covariates
-
-bw_cov <- vector('list', length(names_covariates)); names(bw_cov) <- names_covariates
-for (cc in names_covariates) {
-  bw_cov[[cc]] <- bma_weights[[site]][[cc]]
-  names(bw_cov[[cc]]) <- better_names
-}
-
-par(mfrow=c(2,2), mai=c(.2,.5,.2,.2))
-# Time
-barplot(bw_cov$time, names.arg=better_names, ylab='BMA weight', space=1)
-# Temperature
-barplot(bw_cov$temp, names.arg=better_names, ylab='BMA weight', space=1)
-# Sea level
-barplot(bw_cov$sealevel, names.arg=better_names, ylab='BMA weight', space=1)
-# NAO index
-barplot(bw_cov$nao, names.arg=better_names, ylab='BMA weight', space=1)
-
-
-
-} #=============================================================================
-
 
 #===============================================================================
 # End
