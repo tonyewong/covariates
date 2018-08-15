@@ -73,10 +73,10 @@ for (cc in names(bw)) {
 
 pdf(paste(plot.dir,'bma_weights_all.pdf',sep='/'),width=5,height=4,colormodel='cmyk')
 par(mfrow=c(1,1), mai=c(0.68,1.7,.05,.5), las=1)
-barplot(bw, horiz=TRUE, names.arg='', xlab='', ylab='', space=1, xlim=c(0,0.21))
+barplot(bw, horiz=TRUE, names.arg='', xlab='', ylab='', space=1, xlim=c(0,0.22))
 mtext(side=1, text='BMA weight', line=2.2)
 axis(2, at=seq(1.5,2*length(bw),2), labels=new_names)
-for (cc in 1:length(bw)) {text(bw[cc]+0.041, 1.5+2*(cc-1), paste(round(bw[cc],digits=3)), pos=2)}
+for (cc in 1:length(bw)) {text(bw[cc]+0.048, 1.5+2*(cc-1), paste(round(bw[cc],digits=3)), pos=2)}
 dev.off()
 
 #===============================================================================
