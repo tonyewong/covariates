@@ -122,7 +122,7 @@ barplot(bw_cov$sealevel, names.arg=better_names, xlab='', ylab='', space=1, yaxt
 axis(2, at=seq(0,0.4,0.1), labels=c('0','0.1','0.2','0.3','0.4'))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
-mtext('Sea level index covariate', side=3, line=.6, cex=1)
+mtext('Sea level covariate', side=3, line=.6, cex=1)
 mtext(side=3, text=expression(bold(' c.')), line=.6, cex=1, adj=-0.25)
 for (cc in 1:length(bw_cov$sealevel)) {text(1.5+2*(cc-1), bw_cov$sealevel[cc]+0.01, paste(round(bw_cov$sealevel[cc],digits=3)), pos=3)}
 # NAO index
