@@ -1,6 +1,7 @@
 #===============================================================================
-# get_timeseries_covariates
+# get_timeseries_covariates.R
 #
+# Questions? Tony Wong (anthony.e.wong@colorado.edu)
 #===============================================================================
 
 data_calib <- readRDS('../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-annual_10Jul2018.rds')
