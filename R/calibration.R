@@ -50,11 +50,7 @@ filename.priors <- Sys.glob(paste(dat.dir,'surge_priors_',type.of.priors,'_ppgpd
 
 appen <- paste('ppgpd-experiments_',station,'_',type.of.priors,'_decl',dt.decluster,'-pot',pot.threshold*100,sep='')
 
-if (station=='delfzijl') {
-  ind.in.mles <- 29
-} else if (station=='norfolk') {
-  ind.in.mles <- 30
-}
+
 
 # ^^^ IMPORTANT SETTINGS YOU SHOULD MODIFY, DEPENDING ON THE EXPERIMENT ^^^
 
@@ -120,8 +116,13 @@ source('likelihood_ppgpd.R')
 priors <- readRDS(filename.priors)
 mle.fits <- readRDS(filename.mles)
 
-initial.values <- vector('list', nmodel); names(initial.values) <- types.of.gpd
-for (model in types.of.gpd) {initial.values[[model]] <- mle.fits[[model]][ind.in.mles,]}
+initial.values <- vector('list', length(names_covariates))
+names(initial.values) <- names_covariates
+for (cc in names_covariates) {
+  initial.values[[cc]] <- vector('list', nmodel)
+  names(initial.values[[cc]]) <- types.of.gpd
+  for (model in types.of.gpd) {initial.values[[cc]][[model]] <- mle.fits[[cc]][[model]]['norfolk',]}
+}
 
 print('...done.')
 
@@ -154,13 +155,13 @@ for (cc in names_covariates) {
       } else {auxiliary <- covariates[,cc]; forc_max <- max(auxiliary)}
 
       accept_mcmc <- accept_mcmc_many + (accept_mcmc_few - accept_mcmc_many)/length(parnames_all[[model]])
-      step_mcmc <- as.numeric(0.05*apply(X=mle.fits[[model]], MARGIN=2, FUN=sd))
+      step_mcmc <- as.numeric(0.05*apply(X=mle.fits[[cc]][[model]], MARGIN=2, FUN=sd))
       tbeg=proc.time()
-      amcmc_prelim[[cc]][[model]] = MCMC(log_post_ppgpd, niter_mcmc, initial.values[[model]],
+      amcmc_prelim[[cc]][[model]] = MCMC(log_post_ppgpd, niter_mcmc, initial.values[[cc]][[model]],
                                 adapt=TRUE, acc.rate=accept_mcmc, scale=step_mcmc,
                                 gamma=gamma_mcmc, list=TRUE, n.start=startadapt_mcmc,
                                 parnames=parnames_all[[model]], data_calib=data_calib,
-                                priors=priors, auxiliary=auxiliary, model=model)
+                                priors=priors[[cc]], auxiliary=auxiliary, model=model)
       tend=proc.time()
 
       print(paste('... done. Took ',round(as.numeric(tend-tbeg)[3]/60,2),' minutes', sep=''))
@@ -212,7 +213,7 @@ for (cc in names_covariates) {
                              adapt=TRUE, acc.rate=accept_mcmc, scale=step_mcmc,
                              gamma=gamma_mcmc, list=TRUE, n.start=startadapt_mcmc,
                              parnames=parnames_all[[model]], data_calib=data_calib,
-                             priors=priors, auxiliary=auxiliary, model=model)
+                             priors=priors[[cc]], auxiliary=auxiliary, model=model)
       tend=proc.time()
     } else if(nnode_mcmc > 1) {
       # do parallel chains
