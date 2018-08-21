@@ -26,7 +26,7 @@ if(Sys.info()['user']=='tony') {
   # Tony's local machine (if you aren't me, you almost certainly need to change this...)
   machine <- 'local'
   setwd('/Users/tony/codes/covariates/R')
-  nnode_mcmc_prod000 <- 1          # number of CPUs to use (PRODUCTION chains)
+  nnode_mcmc_prod000 <- 4          # number of CPUs to use (PRODUCTION chains)
 } else {
   # assume on Napa cluster
   machine <- 'remote'
@@ -223,7 +223,7 @@ for (cc in names_covariates) {
                              scale=step_mcmc, adapt=TRUE, acc.rate=accept_mcmc,
                              gamma=gamma_mcmc, list=TRUE, n.start=startadapt_mcmc,
                              parnames=parnames_all[[model]], data_calib=data_calib,
-                             priors=priors, auxiliary=auxiliary, model=model)
+                             priors=priors[[cc]], auxiliary=auxiliary, model=model)
       tend <- proc.time()
     }
     print(paste('... done. Took ',round(as.numeric(tend-tbeg)[3]/60,2),' minutes', sep=''))
