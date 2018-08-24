@@ -444,40 +444,6 @@ print('...done.')
 #===============================================================================
 #
 
-
-## TESTING =====================
-## TESTING =====================
-
-if(FALSE) {
-
-parameters.posterior <- vector('list', length(names_covariates))
-names(parameters.posterior) <- names_covariates
-covjump.posterior <- vector('list', length(names_covariates))
-names(covjump.posterior) <- names_covariates
-for (cc in names_covariates) {
-  parameters.posterior[[cc]] <- vector('list', nmodel)
-  names(parameters.posterior[[cc]]) <- types.of.gpd
-  covjump.posterior[[cc]] <- vector('list', nmodel)
-  names(covjump.posterior[[cc]]) <- types.of.gpd
-  for (model in types.of.gpd) {
-    parameters.posterior[[cc]][[model]] <- amcmc_prelim[[cc]][[model]]$samples[(0.5*niter_mcmc_prelim000+1):niter_mcmc_prelim000,]
-    covjump.posterior[[cc]][[model]] <- amcmc_prelim[[cc]][[model]]$cov.jump
-  }
-}
-
-amcmc_out <- amcmc_prelim
-ifirst <- vector('list', length(names_covariates))
-names(ifirst) <- names_covariates
-for (cc in names_covariates) {
-  ifirst[[cc]] <- 0
-}
-
-}
-
-## TESTING =====================
-## TESTING =====================
-
-
 ## Get maximum length of parameter name, for width of array to write to netcdf
 ## this code will write an n.parameters (rows) x n.ensemble (columns) netcdf file
 ## to get back into the shape we expect, just transpose it
@@ -522,7 +488,7 @@ for (model in types.of.gpd) {
 }
 #outnc <- nc_create(filename.parameters, list(var.parameters, var.parnames, var.covjump))
 outnc <- nc_create(filename.parameters, output.to.file)
-ncvar_put(outnc, var.time, time[,1])
+ncvar_put(outnc, var.time, sealevel[,1])
 for (model in types.of.gpd) {
   ncvar_put(outnc, var.parnames[[model]], parnames_all[[model]])
   for (cc in names_covariates) {

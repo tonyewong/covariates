@@ -5,12 +5,6 @@
 #===============================================================================
 
 
-
-#===============================================================================
-## Get other time series and look at these as predictors for ts.slmax in a
-## multivariate regression sense (or BSTS?)
-
-
 # get NAO index ================================================================
 nao_dat <- read.table('../data/nao_3dp.dat')
 colnames(nao_dat) <- c('year','jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec','ann')
@@ -72,19 +66,36 @@ time <- time[which(time[,1]==min_year):which(time[,1]==max_year), ]
 
 
 #===============================================================================
-# create a single array to hold all the possible covariates
+# create a single array to hold all the possible covariates, and normalize
 
 names_covariates <- c('time','temp','sealevel','nao')
 covariates <- cbind(time[,1], time[,2], temperature[,2], sealevel[,2], nao[,2])
 colnames(covariates) <- c('year',names_covariates)
 
-# normalize the covariates...
+
+# first, normalize the covariates also relative to the first 20 years of the
+# Norfolk tide gauge record
+# of available tide gauge data
+ibeg <- which(covariates[,'year']==1928)
+iend <- which(covariates[,'year']==1937)
 for (cc in names_covariates) {
-  # ... as relative to the mean of first 20 years
-  ##covariates[,cc] <- covariates[,cc] - mean(covariates[1:20, cc])
-  # ... between 0 and 1
-  covariates[,cc] <- (covariates[,cc] - min(covariates[,cc]))/(max(covariates[,cc]) - min(covariates[,cc]))
+  covariates[,cc] <- covariates[,cc] - mean(covariates[ibeg:iend, cc])
 }
+
+# finally, normalize so the hindcast period (covariates) are on 0-1 for
+norms <- array(NA, c(length(names_covariates),2))
+rownames(norms) <- names_covariates
+colnames(norms) <- c('min','max')
+ibeg <- which(covariates[,'year']==1928)
+iend <- which(covariates[,'year']==2013)
+
+for (cc in names_covariates) {
+  # then, between 0 and 1
+  norms[cc,'min'] <- min(covariates[ibeg:iend,cc])
+  norms[cc,'max'] <- max(covariates[ibeg:iend,cc])
+  covariates[,cc] <- (covariates[,cc] - norms[cc,'min'])/(norms[cc,'max'] - norms[cc,'min'])
+}
+
 
 #===============================================================================
 # End

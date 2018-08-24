@@ -1,17 +1,16 @@
 #===============================================================================
 # get_timeseries_covariates.R
 #
+# First, everything is normalized to first 20 years (1928-1937) of the tide
+# gauge data. Then, the covariates are each normalized so that the min-max
+# range for the hindcast period is 0-1.
+#
 # Questions? Tony Wong (anthony.e.wong@colorado.edu)
 #===============================================================================
 
 data_calib <- readRDS('../data/tidegauge_processed_norfolk-delfzijl_decl3-pot99-annual_10Jul2018.rds')
 
 years <- data_calib$norfolk$y89$year
-
-
-#===============================================================================
-## Get other time series and look at these as predictors for ts.slmax in a
-## multivariate regression sense (or BSTS?)
 
 
 # get NAO index ================================================================
@@ -51,7 +50,7 @@ SL.time= sl.dat.new[,1]-0.5     # times are in half-year
 SL.new = sl.dat.new[,2]/1000    # data are in mm
 SL.err = sl.dat.new[,3]/1000
 ibeg=which(SL.time==1961); iend=which(SL.time==1990);
-SL.new = SL.new - mean(SL.new[ibeg:iend])               # make sure SL data are relative to 1961-1990
+SL.new = SL.new - mean(SL.new[ibeg:iend])   # SL data are relative to 1961-1990
 sealevel <- cbind(SL.time, SL.new)
 colnames(sealevel) <- c('year','sealevel')
 
@@ -89,11 +88,6 @@ data_calib$time_length_all <- sum(data_calib$time_length)
 names_covariates <- c('time','temp','sealevel','nao')
 covariates <- cbind(time[,2], temperature[,2], sealevel[,2], nao[,2])
 colnames(covariates) <- names_covariates
-
-# normalize all covariates as relative to the mean of first 20 years
-for (cc in names_covariates) {
-  covariates[,cc] <- covariates[,cc] - mean(covariates[1:20, cc])
-}
 
 
 #===============================================================================
@@ -248,6 +242,34 @@ gmsl_proj <- gmsl_proj[ibeg:iend,]
 
 covariates_proj <- cbind(year_proj, timec_proj[,2], temperature_proj[,2], gmsl_proj[,2], nao_proj[,2])
 colnames(covariates_proj) <- c('year',names_covariates) # time temp sealevel nao
+
+
+# first, normalize the covariates also relative to the first 20 years
+# of available tide gauge data
+for (cc in names_covariates) {
+  covariates[,cc] <- covariates[,cc] - mean(covariates[1:20, cc])
+  covariates_proj[,cc] <- covariates_proj[,cc] - mean(covariates_proj[1:20, cc])
+}
+
+# now paste in the historical data for the period it's available for all time
+# series (1928-2013)
+ibeg <- 1
+iend <- nrow(covariates)
+covariates_proj[ibeg:iend, names_covariates] <- covariates
+
+# finally, normalize so the hindcast period (covariates) are on 0-1
+norms <- array(NA, c(length(names_covariates),2))
+rownames(norms) <- names_covariates
+colnames(norms) <- c('min','max')
+
+for (cc in names_covariates) {
+  # then, between 0 and 1
+  norms[cc,'min'] <- min(covariates[,cc])
+  norms[cc,'max'] <- max(covariates[,cc])
+  covariates[,cc] <- (covariates[,cc] - norms[cc,'min'])/(norms[cc,'max'] - norms[cc,'min'])
+  covariates_proj[,cc] <- (covariates_proj[,cc] - norms[cc,'min'])/(norms[cc,'max'] - norms[cc,'min'])
+}
+
 
 #===============================================================================
 # End

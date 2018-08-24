@@ -19,7 +19,7 @@ library(doParallel)
 library(ncdf4)
 
 appen <- '_threshold99'
-calib_date <- '12Aug2018'
+calib_date <- '21Aug2018'
 dt.decluster <- 3
 pot.threshold <- 0.99
 type.of.priors <- 'normalgamma'     # can be 'uniform' or 'normalgamma'
@@ -33,7 +33,7 @@ if(Sys.info()['user']=='tony') {
   path.data <- '/Users/tony/codes/covariates/data'
   path.output <- '/Users/tony/codes/covariates/output'
   path.save <- paste('/Users/tony/codes/covariates/output/bma',appen,sep='')
-  nnode <- 2          # number of CPUs to use
+  nnode <- 4          # number of CPUs to use
 } else {
   # assume on Napa cluster
   machine <- 'remote'
@@ -188,7 +188,7 @@ finalOutput <- foreach(ee=1:n_experiments,
 
   imp.samp$log.p <- apply(imp.samp$samples, 1, log_post_ppgpd,
                           parnames=colnames(post.samp$samples),
-                          priors=priors,
+                          priors=priors[[cc]],
                           data_calib=data_calib,
                           model = gpd.model,
                           auxiliary=aux)

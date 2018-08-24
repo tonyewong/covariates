@@ -27,7 +27,7 @@ source('parameter_setup.R')
 
 
 # Load the calibrated parameters ===============================================
-filename.parameters <- '../output/calibratedParameters_ppgpd-experiments_norfolk_normalgamma_decl3-pot99_12Aug2018.nc'
+filename.parameters <- '../output/calibratedParameters_ppgpd-experiments_norfolk_normalgamma_decl3-pot99_21Aug2018.nc'
 
 gpd.parameters <- vector('list', length(names_covariates))
 names(gpd.parameters) <- names_covariates

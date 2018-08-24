@@ -60,23 +60,22 @@ for (cc in names(bw)) {
 }
 #> bw_totals
 #       time        temp    sealevel         nao
-#0.001693089 0.286718417 0.469655883 0.118538700
+#0.0007117688 0.1707047611 0.3269115148 0.0844398473
 ## A check things work as expected:
 #> as.numeric(sum(bw_totals) + bw['None, ST'])
 #[1] 1
 ## And normalized to the non-stationary models only:
 #> bw_totals/sum(bw_totals)
 #       time        temp    sealevel         nao
-#0.001931414 0.327077830 0.535766165 0.135224591
-
+#0.001221359 0.292920670 0.560963497 0.144894474
 
 
 pdf(paste(plot.dir,'bma_weights_all.pdf',sep='/'),width=5,height=4,colormodel='cmyk')
 par(mfrow=c(1,1), mai=c(0.68,1.7,.05,.5), las=1)
-barplot(bw, horiz=TRUE, names.arg='', xlab='', ylab='', space=1, xlim=c(0,0.22))
+barplot(bw, horiz=TRUE, names.arg='', xlab='', ylab='', space=1, xlim=c(0,0.52))
 mtext(side=1, text='BMA weight', line=2.2)
 axis(2, at=seq(1.5,2*length(bw),2), labels=new_names)
-for (cc in 1:length(bw)) {text(bw[cc]+0.048, 1.5+2*(cc-1), paste(round(bw[cc],digits=3)), pos=2)}
+for (cc in 1:length(bw)) {text(bw[cc]+0.12, 1.5+2*(cc-1), paste(round(bw[cc],digits=3)), pos=2)}
 dev.off()
 
 #===============================================================================
@@ -102,37 +101,37 @@ for (cc in names_covariates) {
 pdf(paste(plot.dir,'bma_weights_covariates.pdf',sep='/'),width=5,height=5,colormodel='cmyk')
 par(mfrow=c(2,2), mai=c(.6,.6,.3,.2), mgp=c(3,.5,0))
 # Time
-barplot(bw_cov$time, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1.18), xlim=c(0.5,8.5))
+barplot(bw_cov$time, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1.14), xlim=c(0.5,8.5))
 axis(2, at=c(0,.2,.4,.6,.8,1,1.2), labels=c('','0.2','','0.6','','1',''))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('Time covariate', side=3, line=.6, cex=1)
 mtext(side=3, text=expression(bold(' a.')), line=.6, cex=1, adj=-0.25)
-for (cc in 1:length(bw_cov$time)) {text(1.5+2*(cc-1), bw_cov$time[cc]+0.035, paste(round(bw_cov$time[cc],digits=3)), pos=3)}
+for (cc in 1:length(bw_cov$time)) {text(1.5+2*(cc-1), bw_cov$time[cc], paste(round(bw_cov$time[cc],digits=3)), pos=3)}
 # Temperature
-barplot(bw_cov$temp, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0, 0.39), xlim=c(0.5,8.5))
-axis(2, at=seq(0,0.4,0.1), labels=c('0','0.1','0.2','0.3','0.4'))
+barplot(bw_cov$temp, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1.14), xlim=c(0.5,8.5))
+axis(2, at=c(0,.2,.4,.6,.8,1,1.2), labels=c('','0.2','','0.6','','1',''))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('Temperature covariate', side=3, line=.6, cex=1)
 mtext(side=3, text=expression(bold(' b.')), line=.6, cex=1, adj=-0.25)
-for (cc in 1:length(bw_cov$temp)) {text(1.5+2*(cc-1), bw_cov$temp[cc]+0.01, paste(round(bw_cov$temp[cc],digits=3)), pos=3)}
+for (cc in 1:length(bw_cov$temp)) {text(1.5+2*(cc-1), bw_cov$temp[cc], paste(round(bw_cov$temp[cc],digits=3)), pos=3)}
 # Sea level
-barplot(bw_cov$sealevel, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0, 0.38), xlim=c(0.5,8.5))
-axis(2, at=seq(0,0.4,0.1), labels=c('0','0.1','0.2','0.3','0.4'))
+barplot(bw_cov$sealevel, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1.14), xlim=c(0.5,8.5))
+axis(2, at=c(0,.2,.4,.6,.8,1,1.2), labels=c('','0.2','','0.6','','1',''))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('Sea level covariate', side=3, line=.6, cex=1)
 mtext(side=3, text=expression(bold(' c.')), line=.6, cex=1, adj=-0.25)
-for (cc in 1:length(bw_cov$sealevel)) {text(1.5+2*(cc-1), bw_cov$sealevel[cc]+0.01, paste(round(bw_cov$sealevel[cc],digits=3)), pos=3)}
+for (cc in 1:length(bw_cov$sealevel)) {text(1.5+2*(cc-1), bw_cov$sealevel[cc], paste(round(bw_cov$sealevel[cc],digits=3)), pos=3)}
 # NAO index
-barplot(bw_cov$nao, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0, 0.62), xlim=c(0.5,8.5))
-axis(2, at=seq(0,0.6,0.1), labels=c('0','','0.2','','0.4','','0.6'))
+barplot(bw_cov$nao, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1.14), xlim=c(0.5,8.5))
+axis(2, at=c(0,.2,.4,.6,.8,1,1.2), labels=c('','0.2','','0.6','','1',''))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('NAO index covariate', side=3, line=.6, cex=1)
 mtext(side=3, text=expression(bold(' d.')), line=.6, cex=1, adj=-0.25)
-for (cc in 1:length(bw_cov$nao)) {text(1.5+2*(cc-1), bw_cov$nao[cc]+0.015, paste(round(bw_cov$nao[cc],digits=3)), pos=3)}
+for (cc in 1:length(bw_cov$nao)) {text(1.5+2*(cc-1), bw_cov$nao[cc], paste(round(bw_cov$nao[cc],digits=3)), pos=3)}
 dev.off()
 
 #===============================================================================
