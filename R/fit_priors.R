@@ -96,6 +96,10 @@ if(l.doprocessing) {
   data_norfolk <- readRDS(filename.norfolk)
 }
 
+# remove RQ#240 (Ferdinanda Beach, USA) because it's missing about 60 years
+# from 1924-1984
+data_many$rqh0240 <- NULL
+
 # round them all up as one big data set
 data_all <- data_many
 data_all$norfolk <- data_norfolk$y89
@@ -302,6 +306,17 @@ print('...done.')
 #===============================================================================
 #
 
+if(FALSE) {
+# removing RQ#240 from data set
+idx <- which(rownames(deoptim.all[[cc]][[model]])=='rqh0240')
+for (cc in names_covariates) {
+  for (model in types.of.gpd) {
+    deoptim.all[[cc]][[model]] <- deoptim.all[[cc]][[model]][-idx,]
+  }
+}
+}
+
+
 print('fitting prior distributions to the MLE parameters...')
 
 # fit gamma and normal priors
@@ -406,8 +421,8 @@ print('...done.')
 
 if(FALSE) {
 
-deoptim.all <- readRDS('../data/surge_MLEs_ppgpd_decl3-pot99_20Aug2018.rds')
-priors_normalgamma <- readRDS('../data/surge_priors_normalgamma_ppgpd_decl3-pot99_20Aug2018.rds')
+deoptim.all <- readRDS('../data/surge_MLEs_ppgpd_decl3-pot99_24Aug2018.rds')
+priors_normalgamma <- readRDS('../data/surge_priors_normalgamma_ppgpd_decl3-pot99_24Aug2018.rds')
 
 plot_priors <- function(cc, appen='') {
 
@@ -435,13 +450,43 @@ plot_priors <- function(cc, appen='') {
     ran <- diff(quantile(parameters.pooled, c(0,1)))
     lims[pp,] <- c(min(parameters.pooled) - frac.ran*ran , max(parameters.pooled) + frac.ran*ran)
   pp <- 5 # xi0
-    parameters.pooled <- c(deoptim.all[[cc]]$gpd5[,5], deoptim.all[[cc]]$gpd6[,5])
+    parameters.pooled <- c(deoptim.all[[cc]]$gpd3[,3], deoptim.all[[cc]]$gpd4[,4],
+                           deoptim.all[[cc]]$gpd5[,5], deoptim.all[[cc]]$gpd6[,5])
     ran <- diff(quantile(parameters.pooled, c(0,1)))
     lims[pp,] <- c(min(parameters.pooled) - frac.ran*ran , max(parameters.pooled) + frac.ran*ran)
   pp <- 6 # xi1
     parameters.pooled <- c(deoptim.all[[cc]]$gpd6[,6])
     ran <- diff(quantile(parameters.pooled, c(0,1)))
     lims[pp,] <- c(min(parameters.pooled) - frac.ran*ran , max(parameters.pooled) + frac.ran*ran)
+
+  ylims <- rep(NA,6)
+  # lambda0
+  ylims[1] <- max( c(hist(deoptim.all[[cc]]$gpd3[,1], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd4[,1], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd5[,1], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd6[,1], plot=FALSE)$density))
+  # lambda1
+  ylims[2] <- max( c(hist(deoptim.all[[cc]]$gpd4[,2], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd5[,2], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd6[,2], plot=FALSE)$density))
+  # sigma0
+  ylims[3] <- max( c(hist(deoptim.all[[cc]]$gpd3[,2], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd4[,3], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd5[,3], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd6[,3], plot=FALSE)$density))
+  # sigma1
+  ylims[4] <- max( c(hist(deoptim.all[[cc]]$gpd5[,4], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd6[,4], plot=FALSE)$density))
+  # xi0
+  ylims[5] <- max( c(hist(deoptim.all[[cc]]$gpd3[,3], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd4[,4], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd5[,5], plot=FALSE)$density,
+                             hist(deoptim.all[[cc]]$gpd6[,5], plot=FALSE)$density))
+  # xi1
+  box.width <- diff(lims[6,])/nbins; box.edges <- seq(from=lims[6,1], to=lims[6,2], by=box.width)
+  ylims[6] <- max( c(hist(deoptim.all[[cc]]$gpd6[,6], breaks=box.edges, plot=FALSE)$density))
+  # padding
+  ylims <- 1.2 * ylims
 
   if (nchar(appen)==0) {
     plotname <- paste('../figures/priors_normalgamma_',cc,'.pdf',sep='')
@@ -455,7 +500,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 1; par(mai=c(.25,.59,.25,.01))
   box.width <- diff(lims[1,])/nbins; box.edges <- seq(from=lims[1,1], to=lims[1,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[1,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[1]))
   x.tmp <- seq(from=lims[1,1], to=lims[1,2], length.out=1000)
   lines(x.tmp, dgamma(x=x.tmp, shape=priors_normalgamma[[cc]][[model]]$lambda$shape,
                       rate=priors_normalgamma[[cc]][[model]]$lambda$rate), col='red', lwd=2)
@@ -466,7 +511,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 2; par(mai=c(.25,.3,.25,.3))
   box.width <- diff(lims[3,])/nbins; box.edges <- seq(from=lims[3,1], to=lims[3,2], by=box.width)
   hist(log(deoptim.all[[cc]][[model]][,pp]), xlim=lims[3,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[3]))
   rate.tmp <- median(log(deoptim.all[[cc]][[model]][,2])) / (0.5*(max(log(deoptim.all[[cc]][[model]][,2]))-min(log(deoptim.all[[cc]][[model]][,2]))))^2
   shape.tmp <- median(log(deoptim.all[[cc]][[model]][,2])) * rate.tmp
   x.tmp <- seq(from=lims[3,1], to=lims[3,2], length.out=1000); lines(x.tmp, dgamma(x=x.tmp, shape=shape.tmp, rate=rate.tmp), col='red', lwd=2)
@@ -475,7 +520,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 3; par(mai=c(.25,.3,.25,.3))
   box.width <- diff(lims[5,])/nbins; box.edges <- seq(from=lims[5,1], to=lims[5,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[5,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[5]))
   x.tmp <- seq(from=lims[5,1], to=lims[5,2], length.out=1000); lines(x.tmp, dnorm(x=x.tmp, mean=priors_normalgamma[[cc]][[model]]$xi$mean, sd=priors_normalgamma[[cc]][[model]]$xi$sd), col='red', lwd=2)
   u <- par('usr'); arrows(u[1], u[3], u[1], .95*u[4], code=2, length=.15, xpd=TRUE)
   plot.new()
@@ -485,7 +530,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 1; par(mai=c(.3,.59,.2,.01))
   box.width <- diff(lims[1,])/nbins; box.edges <- seq(from=lims[1,1], to=lims[1,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[1,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[1]))
   x.tmp <- seq(from=lims[1,1], to=lims[1,2], length.out=1000)
   lines(x.tmp, dgamma(x=x.tmp, shape=priors_normalgamma[[cc]][[model]]$lambda0$shape,
                                rate=priors_normalgamma[[cc]][[model]]$lambda0$rate), col='red', lwd=2)
@@ -495,7 +540,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 2; par(mai=c(.3,.35,.2,.25))
   box.width <- diff(lims[2,])/nbins; box.edges <- seq(from=lims[2,1], to=lims[2,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[2,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[2]))
   x.tmp <- seq(from=lims[2,1], to=lims[2,2], length.out=1000)
   lines(x.tmp, dnorm(x=x.tmp, mean=priors_normalgamma[[cc]][[model]]$lambda1$mean,
                      sd=priors_normalgamma[[cc]][[model]]$lambda1$sd), col='red', lwd=2)
@@ -503,7 +548,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 3; par(mai=c(.3,.3,.2,.3))
   box.width <- diff(lims[3,])/nbins; box.edges <- seq(from=lims[3,1], to=lims[3,2], by=box.width)
   hist(log(deoptim.all[[cc]][[model]][,pp]), xlim=lims[3,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[3]))
   rate.tmp <- median(log(deoptim.all[[cc]][[model]][,3])) / (0.5*(max(log(deoptim.all[[cc]][[model]][,3]))-min(log(deoptim.all[[cc]][[model]][,3]))))^2
   shape.tmp <- median(log(deoptim.all[[cc]][[model]][,3])) * rate.tmp
   x.tmp <- seq(from=lims[3,1], to=lims[3,2], length.out=1000); lines(x.tmp, dgamma(x=x.tmp, shape=shape.tmp, rate=rate.tmp), col='red', lwd=2)
@@ -512,7 +557,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 4; par(mai=c(.3,.3,.2,.3))
   box.width <- diff(lims[5,])/nbins; box.edges <- seq(from=lims[5,1], to=lims[5,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[5,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[5]))
   x.tmp <- seq(from=lims[5,1], to=lims[5,2], length.out=1000)
   lines(x.tmp, dnorm(x=x.tmp, mean=priors_normalgamma[[cc]][[model]]$xi$mean,
                      sd=priors_normalgamma[[cc]][[model]]$xi$sd), col='red', lwd=2)
@@ -523,7 +568,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 1; par(mai=c(.35,.59,.15,.01))
   box.width <- diff(lims[1,])/nbins; box.edges <- seq(from=lims[1,1], to=lims[1,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[1,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[1]))
   x.tmp <- seq(from=lims[1,1], to=lims[1,2], length.out=1000)
   lines(x.tmp, dgamma(x=x.tmp, shape=priors_normalgamma[[cc]][[model]]$lambda0$shape,
                       rate=priors_normalgamma[[cc]][[model]]$lambda0$rate), col='red', lwd=2)
@@ -533,7 +578,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 2; par(mai=c(.35,.35,.15,.25))
   box.width <- diff(lims[2,])/nbins; box.edges <- seq(from=lims[2,1], to=lims[2,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[2,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[2]))
   x.tmp <- seq(from=lims[2,1], to=lims[2,2], length.out=1000)
   lines(x.tmp, dnorm(x=x.tmp, mean=priors_normalgamma[[cc]][[model]]$lambda1$mean,
                      sd=priors_normalgamma[[cc]][[model]]$lambda1$sd), col='red', lwd=2)
@@ -541,7 +586,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 3; par(mai=c(.35,.3,.15,.3))
   box.width <- diff(lims[3,])/nbins; box.edges <- seq(from=lims[3,1], to=lims[3,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[3,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[3]))
   x.tmp <- seq(from=lims[3,1], to=lims[3,2], length.out=1000)
   lines(x.tmp, dgamma(x=x.tmp, shape=priors_normalgamma[[cc]][[model]]$sigma0$shape,
                       rate=priors_normalgamma[[cc]][[model]]$sigma0$rate), col='red', lwd=2)
@@ -549,7 +594,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 4; par(mai=c(.35,.3,.15,.3))
   box.width <- diff(lims[4,])/nbins; box.edges <- seq(from=lims[4,1], to=lims[4,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[4,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[4]))
   x.tmp <- seq(from=lims[4,1], to=lims[4,2], length.out=1000)
   lines(x.tmp, dnorm(x=x.tmp, mean=priors_normalgamma[[cc]][[model]]$sigma1$mean,
                      sd=priors_normalgamma[[cc]][[model]]$sigma1$sd), col='red', lwd=2)
@@ -557,7 +602,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 5; par(mai=c(.35,.3,.15,.3))
   box.width <- diff(lims[5,])/nbins; box.edges <- seq(from=lims[5,1], to=lims[5,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[5,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i')
+       breaks=box.edges, xaxt='n', yaxt='n', yaxs='i', ylim=c(0,ylims[5]))
   x.tmp <- seq(from=lims[5,1], to=lims[5,2], length.out=1000)
   lines(x.tmp, dnorm(x=x.tmp, mean=priors_normalgamma[[cc]][[model]]$xi$mean,
                      sd=priors_normalgamma[[cc]][[model]]$xi$sd), col='red', lwd=2)
@@ -568,7 +613,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 1; par(mai=c(.5,.59,.01,.01))
   box.width <- diff(lims[1,])/nbins; box.edges <- seq(from=lims[1,1], to=lims[1,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[1,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, yaxt='n', yaxs='i')
+       breaks=box.edges, yaxt='n', yaxs='i', ylim=c(0,ylims[1]))
   x.tmp <- seq(from=lims[1,1], to=lims[1,2], length.out=1000)
   lines(x.tmp, dgamma(x=x.tmp, shape=priors_normalgamma[[cc]][[model]]$lambda0$shape,
                       rate=priors_normalgamma[[cc]][[model]]$lambda0$rate), col='red', lwd=2)
@@ -579,7 +624,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 2; par(mai=c(.5,.35,.01,.25))
   box.width <- diff(lims[2,])/nbins; box.edges <- seq(from=lims[2,1], to=lims[2,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[2,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, yaxt='n', yaxs='i')
+       breaks=box.edges, yaxt='n', yaxs='i', ylim=c(0,ylims[2]))
   x.tmp <- seq(from=lims[2,1], to=lims[2,2], length.out=1000)
   lines(x.tmp, dnorm(x=x.tmp, mean=priors_normalgamma[[cc]][[model]]$lambda1$mean,
                      sd=priors_normalgamma[[cc]][[model]]$lambda1$sd), col='red', lwd=2)
@@ -588,7 +633,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 3; par(mai=c(.5,.3,.01,.3))
   box.width <- diff(lims[3,])/nbins; box.edges <- seq(from=lims[3,1], to=lims[3,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[3,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, yaxt='n', yaxs='i')
+       breaks=box.edges, yaxt='n', yaxs='i', ylim=c(0,ylims[3]))
   x.tmp <- seq(from=lims[3,1], to=lims[3,2], length.out=1000)
   lines(x.tmp, dgamma(x=x.tmp, shape=priors_normalgamma[[cc]][[model]]$sigma0$shape,
                       rate=priors_normalgamma[[cc]][[model]]$sigma0$rate), col='red', lwd=2)
@@ -597,7 +642,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 4; par(mai=c(.5,.3,.01,.3))
   box.width <- diff(lims[4,])/nbins; box.edges <- seq(from=lims[4,1], to=lims[4,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[4,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, yaxt='n', yaxs='i')
+       breaks=box.edges, yaxt='n', yaxs='i', ylim=c(0,ylims[4]))
   x.tmp <- seq(from=lims[4,1], to=lims[4,2], length.out=1000)
   lines(x.tmp, dnorm(x=x.tmp, mean=priors_normalgamma[[cc]][[model]]$sigma1$mean,
                      sd=priors_normalgamma[[cc]][[model]]$sigma1$sd), col='red', lwd=2)
@@ -606,7 +651,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 5; par(mai=c(.5,.3,.01,.3))
   box.width <- diff(lims[5,])/nbins; box.edges <- seq(from=lims[5,1], to=lims[5,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[5,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, yaxt='n', yaxs='i')
+       breaks=box.edges, yaxt='n', yaxs='i', ylim=c(0,ylims[5]))
   x.tmp <- seq(from=lims[5,1], to=lims[5,2], length.out=1000)
   lines(x.tmp, dnorm(x=x.tmp, mean=priors_normalgamma[[cc]][[model]]$xi0$mean,
                      sd=priors_normalgamma[[cc]][[model]]$xi0$sd), col='red', lwd=2)
@@ -615,7 +660,7 @@ plot_priors <- function(cc, appen='') {
   pp <- 6; par(mai=c(.5,.3,.01,.3))
   box.width <- diff(lims[6,])/nbins; box.edges <- seq(from=lims[6,1], to=lims[6,2], by=box.width)
   hist(deoptim.all[[cc]][[model]][,pp], xlim=lims[6,], freq=FALSE, main='', xlab='', ylab='',
-       breaks=box.edges, yaxt='n', yaxs='i')
+       breaks=box.edges, yaxt='n', yaxs='i', ylim=c(0,ylims[6]))
   x.tmp <- seq(from=lims[6,1], to=lims[6,2], length.out=1000)
   lines(x.tmp, dnorm(x=x.tmp, mean=priors_normalgamma[[cc]][[model]]$xi1$mean,
                      sd=priors_normalgamma[[cc]][[model]]$xi1$sd), col='red', lwd=2)

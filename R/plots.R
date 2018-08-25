@@ -60,14 +60,14 @@ for (cc in names(bw)) {
 }
 #> bw_totals
 #       time        temp    sealevel         nao
-#0.0007117688 0.1707047611 0.3269115148 0.0844398473
+#0.2099934 0.1867303 0.1873299 0.1880989
 ## A check things work as expected:
 #> as.numeric(sum(bw_totals) + bw['None, ST'])
 #[1] 1
 ## And normalized to the non-stationary models only:
 #> bw_totals/sum(bw_totals)
 #       time        temp    sealevel         nao
-#0.001221359 0.292920670 0.560963497 0.144894474
+#0.2719585 0.2418309 0.2426074 0.2436033
 
 
 pdf(paste(plot.dir,'bma_weights_all.pdf',sep='/'),width=5,height=4,colormodel='cmyk')
@@ -101,32 +101,32 @@ for (cc in names_covariates) {
 pdf(paste(plot.dir,'bma_weights_covariates.pdf',sep='/'),width=5,height=5,colormodel='cmyk')
 par(mfrow=c(2,2), mai=c(.6,.6,.3,.2), mgp=c(3,.5,0))
 # Time
-barplot(bw_cov$time, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1.14), xlim=c(0.5,8.5))
-axis(2, at=c(0,.2,.4,.6,.8,1,1.2), labels=c('','0.2','','0.6','','1',''))
+barplot(bw_cov$time, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1), xlim=c(0.5,8.5))
+axis(2, at=c(0,.2,.4,.6,.8,1), labels=c('','0.2','','0.6','','1'))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('Time covariate', side=3, line=.6, cex=1)
 mtext(side=3, text=expression(bold(' a.')), line=.6, cex=1, adj=-0.25)
 for (cc in 1:length(bw_cov$time)) {text(1.5+2*(cc-1), bw_cov$time[cc], paste(round(bw_cov$time[cc],digits=3)), pos=3)}
 # Temperature
-barplot(bw_cov$temp, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1.14), xlim=c(0.5,8.5))
-axis(2, at=c(0,.2,.4,.6,.8,1,1.2), labels=c('','0.2','','0.6','','1',''))
+barplot(bw_cov$temp, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1), xlim=c(0.5,8.5))
+axis(2, at=c(0,.2,.4,.6,.8,1), labels=c('','0.2','','0.6','','1'))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('Temperature covariate', side=3, line=.6, cex=1)
 mtext(side=3, text=expression(bold(' b.')), line=.6, cex=1, adj=-0.25)
 for (cc in 1:length(bw_cov$temp)) {text(1.5+2*(cc-1), bw_cov$temp[cc], paste(round(bw_cov$temp[cc],digits=3)), pos=3)}
 # Sea level
-barplot(bw_cov$sealevel, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1.14), xlim=c(0.5,8.5))
-axis(2, at=c(0,.2,.4,.6,.8,1,1.2), labels=c('','0.2','','0.6','','1',''))
+barplot(bw_cov$sealevel, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1), xlim=c(0.5,8.5))
+axis(2, at=c(0,.2,.4,.6,.8,1), labels=c('','0.2','','0.6','','1'))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('Sea level covariate', side=3, line=.6, cex=1)
 mtext(side=3, text=expression(bold(' c.')), line=.6, cex=1, adj=-0.25)
 for (cc in 1:length(bw_cov$sealevel)) {text(1.5+2*(cc-1), bw_cov$sealevel[cc], paste(round(bw_cov$sealevel[cc],digits=3)), pos=3)}
 # NAO index
-barplot(bw_cov$nao, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1.14), xlim=c(0.5,8.5))
-axis(2, at=c(0,.2,.4,.6,.8,1,1.2), labels=c('','0.2','','0.6','','1',''))
+barplot(bw_cov$nao, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1), xlim=c(0.5,8.5))
+axis(2, at=c(0,.2,.4,.6,.8,1), labels=c('','0.2','','0.6','','1'))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('NAO index covariate', side=3, line=.6, cex=1)
@@ -147,8 +147,9 @@ pdf(paste(plot.dir,'returnlevels_pdf_bar.pdf',sep='/'),width=7,height=5.5,colorm
 par(mfrow=c(2,2), mai=c(.6,.50,.4,.1))
 yy <- 'y100'
 offset <- 0.5
+ytop <- 3.5
 cc <- 'time' # =======================
-plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, 2.92+offset),
+plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, ytop+offset),
      lwd=2.5, lty=1, xlab='', ylab='', xaxs='i', yaxs='i', yaxt='n', axes=FALSE, col='black')
 lines(pdf.rl[[cc]]$gpd4[[yy]]$x, offset+pdf.rl[[cc]]$gpd4[[yy]]$y, col='darkorange3', lwd=2, lty=2)
 lines(pdf.rl[[cc]]$gpd5[[yy]]$x, offset+pdf.rl[[cc]]$gpd5[[yy]]$y, col='mediumslateblue', lwd=2, lty=2)
@@ -173,7 +174,7 @@ legend(2.75, 3, c('ST','NS1','NS2','NS3','BMA'), lty=c(4,2,2,2,1), cex=1, bty='n
        col=c('seagreen','darkorange3','mediumslateblue','mediumvioletred', 'black'))
 #
 cc <- 'temp' # =======================
-plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, 2.92+offset),
+plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, ytop+offset),
      lwd=2.5, lty=1, xlab='', ylab='', xaxs='i', yaxs='i', yaxt='n', axes=FALSE, col='black')
 lines(pdf.rl[[cc]]$gpd4[[yy]]$x, offset+pdf.rl[[cc]]$gpd4[[yy]]$y, col='darkorange3', lwd=2, lty=2)
 lines(pdf.rl[[cc]]$gpd5[[yy]]$x, offset+pdf.rl[[cc]]$gpd5[[yy]]$y, col='mediumslateblue', lwd=2, lty=2)
@@ -196,7 +197,7 @@ mtext(paste('100-year return level in',proj_years[1],'[m]'), side=1, line=2.4, c
 axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
 #
 cc <- 'sealevel' # =======================
-plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, 2.92+offset),
+plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, ytop+offset),
      lwd=2.5, lty=1, xlab='', ylab='', xaxs='i', yaxs='i', yaxt='n', axes=FALSE, col='black')
 lines(pdf.rl[[cc]]$gpd4[[yy]]$x, offset+pdf.rl[[cc]]$gpd4[[yy]]$y, col='darkorange3', lwd=2, lty=2)
 lines(pdf.rl[[cc]]$gpd5[[yy]]$x, offset+pdf.rl[[cc]]$gpd5[[yy]]$y, col='mediumslateblue', lwd=2, lty=2)
@@ -219,7 +220,7 @@ mtext(paste('100-year return level in',proj_years[1],'[m]'), side=1, line=2.4, c
 axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
 #
 cc <- 'nao' # =======================
-plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, 2.92+offset),
+plot(pdf.rl[[cc]]$bma[[yy]]$x, offset+pdf.rl[[cc]]$bma[[yy]]$y, type='l', xlim=c(1, 4), ylim=c(0, ytop+offset),
      lwd=2.5, lty=1, xlab='', ylab='', xaxs='i', yaxs='i', yaxt='n', axes=FALSE, col='black')
 lines(pdf.rl[[cc]]$gpd4[[yy]]$x, offset+pdf.rl[[cc]]$gpd4[[yy]]$y, col='darkorange3', lwd=2, lty=2)
 lines(pdf.rl[[cc]]$gpd5[[yy]]$x, offset+pdf.rl[[cc]]$gpd5[[yy]]$y, col='mediumslateblue', lwd=2, lty=2)
@@ -255,7 +256,7 @@ pdf(paste(plot.dir,'returnlevels_bma_pdf_bar.pdf',sep='/'),width=4,height=4,colo
 par(mfrow=c(1,1), mai=c(.8,.50,.25,.25))
 yy <- 'y100'
 offset <- 0.48
-plot(pdf.rl$bma[[yy]]$x, offset+pdf.rl$bma[[yy]]$y, type='l', xlim=c(1.5, 4), ylim=c(0, 3.2+offset),
+plot(pdf.rl$bma[[yy]]$x, offset+pdf.rl$bma[[yy]]$y, type='l', xlim=c(1.5, 4), ylim=c(0, 4+offset),
      lwd=2.5, lty=1, xlab='', ylab='', xaxs='i', yaxs='i', yaxt='n', axes=FALSE, col='black')
 lines(pdf.rl$time$bma[[yy]]$x, offset+pdf.rl$time$bma[[yy]]$y, col='darkorange3', lwd=2, lty=2)
 lines(pdf.rl$temperature$bma[[yy]]$x, offset+pdf.rl$temperature$bma[[yy]]$y, col='mediumslateblue', lwd=2, lty=2)

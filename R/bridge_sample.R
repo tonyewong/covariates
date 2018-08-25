@@ -19,7 +19,7 @@ library(doParallel)
 library(ncdf4)
 
 appen <- '_threshold99'
-calib_date <- '21Aug2018'
+calib_date <- '24Aug2018'
 dt.decluster <- 3
 pot.threshold <- 0.99
 type.of.priors <- 'normalgamma'     # can be 'uniform' or 'normalgamma'
