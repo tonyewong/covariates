@@ -10,7 +10,7 @@ rm(list=ls())
 setwd('Users/tony/codes/covariates/R')
 plot.dir <- '/Users/tony/codes/covariates/figures'
 
-rl_years <- c(20, 100) # in years return period, which return levels do you want?
+rl_years <- c(2,3,5,10,20,30,50,80,100,150,200,250,300,350,400,450,500,1000) # in years return period, which return levels do you want?
 proj_years <- c(2065)  # what years do we want return level projections for?
 
 # Read in BMA results ==========================================================
@@ -199,6 +199,18 @@ for (yy in names_rl) {
   pdf.rl$bma[[yy]] <- density(rl$bma[,yy]/1000, from=0, to=10)
   q.rl$bma[[yy]] <- quantile(rl$bma[,yy]/1000, quantiles.to.grab)
 }
+
+
+# Table S2 =====================================================================
+# Percentiles for return levels
+
+percentiles <- c(.025, .05, .25, .5, .75, .95, .975)
+table_s2 <- array(NA, c(n.rl, length(percentiles)))
+rownames(table_s2) <- names_rl
+for (irow in 1:n.rl) {
+  table_s2[irow,] <- quantile(rl$bma[,names_rl[irow]], percentiles)/1000
+}
+write.csv(table_s2, file='../output/table_s2.csv')
 
 
 # Save image to use for plotting ===============================================

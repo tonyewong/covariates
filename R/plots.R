@@ -30,7 +30,7 @@ source('get_timeseries_covariates.R')
 
 
 #===============================================================================
-# FIGURE ???
+# FIGURE 3
 # barplot of BMA weights all together
 #===============================================================================
 
@@ -83,7 +83,7 @@ dev.off()
 
 
 #===============================================================================
-# FIGURE ???
+# FIGURE 1
 # barplot of BMA weights for each individual covariate model
 #===============================================================================
 
@@ -106,7 +106,7 @@ axis(2, at=c(0,.2,.4,.6,.8,1), labels=c('','0.2','','0.6','','1'))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('Time covariate', side=3, line=.6, cex=1)
-mtext(side=3, text=expression(bold(' a.')), line=.6, cex=1, adj=-0.25)
+mtext(side=3, text=expression(bold(' (a)')), line=.6, cex=1, adj=-0.25)
 for (cc in 1:length(bw_cov$time)) {text(1.5+2*(cc-1), bw_cov$time[cc], paste(round(bw_cov$time[cc],digits=3)), pos=3)}
 # Temperature
 barplot(bw_cov$temp, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1), xlim=c(0.5,8.5))
@@ -114,7 +114,7 @@ axis(2, at=c(0,.2,.4,.6,.8,1), labels=c('','0.2','','0.6','','1'))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('Temperature covariate', side=3, line=.6, cex=1)
-mtext(side=3, text=expression(bold(' b.')), line=.6, cex=1, adj=-0.25)
+mtext(side=3, text=expression(bold(' (b)')), line=.6, cex=1, adj=-0.25)
 for (cc in 1:length(bw_cov$temp)) {text(1.5+2*(cc-1), bw_cov$temp[cc], paste(round(bw_cov$temp[cc],digits=3)), pos=3)}
 # Sea level
 barplot(bw_cov$sealevel, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1), xlim=c(0.5,8.5))
@@ -122,7 +122,7 @@ axis(2, at=c(0,.2,.4,.6,.8,1), labels=c('','0.2','','0.6','','1'))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('Sea level covariate', side=3, line=.6, cex=1)
-mtext(side=3, text=expression(bold(' c.')), line=.6, cex=1, adj=-0.25)
+mtext(side=3, text=expression(bold(' (c)')), line=.6, cex=1, adj=-0.25)
 for (cc in 1:length(bw_cov$sealevel)) {text(1.5+2*(cc-1), bw_cov$sealevel[cc], paste(round(bw_cov$sealevel[cc],digits=3)), pos=3)}
 # NAO index
 barplot(bw_cov$nao, names.arg=better_names, xlab='', ylab='', space=1, yaxt='n', ylim=c(0,1), xlim=c(0.5,8.5))
@@ -130,7 +130,7 @@ axis(2, at=c(0,.2,.4,.6,.8,1), labels=c('','0.2','','0.6','','1'))
 mtext(side=1, text='Model', line=2.2)
 mtext(side=2, text='BMA weight', line=2.2)
 mtext('NAO index covariate', side=3, line=.6, cex=1)
-mtext(side=3, text=expression(bold(' d.')), line=.6, cex=1, adj=-0.25)
+mtext(side=3, text=expression(bold(' (d)')), line=.6, cex=1, adj=-0.25)
 for (cc in 1:length(bw_cov$nao)) {text(1.5+2*(cc-1), bw_cov$nao[cc], paste(round(bw_cov$nao[cc],digits=3)), pos=3)}
 dev.off()
 
@@ -139,7 +139,7 @@ dev.off()
 
 
 #===============================================================================
-# FIGURE ???
+# FIGURE 2
 # Panel for each covariate, return level pdfs and boxplot beneath with quantiles
 #===============================================================================
 
@@ -167,7 +167,7 @@ u <- par("usr")
 arrows(u[1], u[3], u[1], .99*u[4], code = 2, length=.15, xpd = TRUE)
 mtext('Probability density', side=2, line=1, cex=1);
 mtext('Time covariate', side=3, line=.6, cex=1)
-mtext(side=3, text=expression(bold(' a.')), line=.6, cex=1, adj=0)
+mtext(side=3, text=expression(bold(' (a)')), line=.6, cex=1, adj=0)
 mtext(paste('100-year return level in',proj_years[1],'[m]'), side=1, line=2.4, cex=0.9);
 axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
 legend(2.75, 3, c('ST','NS1','NS2','NS3','BMA'), lty=c(4,2,2,2,1), cex=1, bty='n', lwd=2,
@@ -192,7 +192,7 @@ u <- par("usr")
 arrows(u[1], u[3], u[1], .99*u[4], code = 2, length=.15, xpd = TRUE)
 mtext('Probability density', side=2, line=1, cex=1);
 mtext('Temperature covariate', side=3, line=.6, cex=1)
-mtext(side=3, text=expression(bold(' b.')), line=.6, cex=1, adj=0)
+mtext(side=3, text=expression(bold(' (b)')), line=.6, cex=1, adj=0)
 mtext(paste('100-year return level in',proj_years[1],'[m]'), side=1, line=2.4, cex=0.9);
 axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
 #
@@ -215,7 +215,7 @@ u <- par("usr")
 arrows(u[1], u[3], u[1], .99*u[4], code = 2, length=.15, xpd = TRUE)
 mtext('Probability density', side=2, line=1, cex=1);
 mtext('Sea level covariate', side=3, line=.6, cex=1)
-mtext(side=3, text=expression(bold(' c.')), line=.6, cex=1, adj=0)
+mtext(side=3, text=expression(bold(' (c)')), line=.6, cex=1, adj=0)
 mtext(paste('100-year return level in',proj_years[1],'[m]'), side=1, line=2.4, cex=0.9);
 axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
 #
@@ -238,7 +238,7 @@ u <- par("usr")
 arrows(u[1], u[3], u[1], .99*u[4], code = 2, length=.15, xpd = TRUE)
 mtext('Probability density', side=2, line=1, cex=1);
 mtext('NAO index covariate', side=3, line=.6, cex=1)
-mtext(side=3, text=expression(bold(' d.')), line=.6, cex=1, adj=0)
+mtext(side=3, text=expression(bold(' (d)')), line=.6, cex=1, adj=0)
 mtext(paste('100-year return level in',proj_years[1],'[m]'), side=1, line=2.4, cex=0.9);
 axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
 dev.off()
@@ -248,7 +248,7 @@ dev.off()
 
 
 #===============================================================================
-# FIGURE ???
+# FIGURE 4
 # Panel for each covariate, return level pdfs and boxplot beneath with quantiles
 #===============================================================================
 
@@ -294,6 +294,30 @@ dev.off()
 #===============================================================================
 
 
+
+#===============================================================================
+# FIGURE S1
+# Return periods vs return levels
+#===============================================================================
+
+
+pdf(paste(plot.dir,'returnperiods-levels.pdf',sep='/'),width=5,height=4,colormodel='cmyk')
+par(mfrow=c(1,1), mai=c(0.68,0.7,.05,.5))
+plot(rl_years, table_s2[,4], type='l', xlim=c(2,500), ylim=c(1,12),
+     lwd=2, xlab='', ylab='', xaxt='n', yaxt='n', log='x')
+
+mtext(side=1, text='Return period (years)', line=2.2)
+mtext(side=2, text='Return level (m)', line=2.2)
+axis(1, at=c(3,10,30,100,300),
+     labels=c(3,10,30,100,300))
+axis(2, at=seq(0,12), labels=c('0','','2','','4','','6','','8','','10','','12'))
+
+polygon(c(rl_years,rev(rl_years)), c(table_s2[,1], rev(table_s2[,7])), col='lightcyan', border=NA)
+polygon(c(rl_years,rev(rl_years)), c(table_s2[,2], rev(table_s2[,6])), col='lightblue1', border=NA)
+polygon(c(rl_years,rev(rl_years)), c(table_s2[,3], rev(table_s2[,5])), col='lightblue3', border=NA)
+lines(rl_years, table_s2[,4], type='l', lwd=2)
+
+dev.off()
 
 
 #===============================================================================
