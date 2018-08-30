@@ -170,7 +170,7 @@ mtext('Time covariate', side=3, line=.6, cex=1)
 mtext(side=3, text=expression(bold(' (a)')), line=.6, cex=1, adj=0)
 mtext(paste('100-year return level in',proj_years[1],'[m]'), side=1, line=2.4, cex=0.9);
 axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
-legend(2.75, 3, c('ST','NS1','NS2','NS3','BMA'), lty=c(4,2,2,2,1), cex=1, bty='n', lwd=2,
+legend(2.9, 3.7, c('ST','NS1','NS2','NS3','BMA'), lty=c(4,2,2,2,1), cex=1, bty='n', lwd=2,
        col=c('seagreen','darkorange3','mediumslateblue','mediumvioletred', 'black'))
 #
 cc <- 'temp' # =======================
@@ -287,7 +287,7 @@ arrows(u[1], u[3], u[1], .99*u[4], code = 2, length=.15, xpd = TRUE)
 mtext('Probability density', side=2, line=1, cex=1);
 mtext(paste('100-year return level in',proj_years[1],'[m]'), side=1, line=2.4, cex=0.9);
 axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
-legend(2.8, 3.7, c('Time','Temperature','Sea level','NAO','BMA'), lty=c(4,2,2,2,1), cex=1, bty='n', lwd=2,
+legend(2.8, 3.7, c('Time','Temperature','Sea level','NAO','BMA'), lty=c(2,2,2,2,1), cex=1, bty='n', lwd=2,
        col=c('darkorange3','mediumslateblue','mediumvioletred','seagreen','black'))
 dev.off()
 
