@@ -5,8 +5,8 @@
 #===============================================================================
 
 rm(list=ls())
-setwd('Users/tony/codes/covariates/R')
-plot.dir <- '/Users/tony/codes/covariates/figures'
+setwd('~/codes/covariates/R')
+plot.dir <- '~/codes/covariates/figures'
 
 
 # Read in previous analysis work ===============================================
@@ -252,16 +252,16 @@ dev.off()
 # Panel for each covariate, return level pdfs and boxplot beneath with quantiles
 #===============================================================================
 
-pdf(paste(plot.dir,'returnlevels_bma_pdf_bar.pdf',sep='/'),width=4,height=4,colormodel='cmyk')
-par(mfrow=c(1,1), mai=c(.8,.50,.25,.25))
+pdf(paste(plot.dir,'returnlevels_bma_pdf_bar_new.pdf',sep='/'),width=4,height=3,colormodel='cmyk')
+par(mfrow=c(1,1), mai=c(.75,.50,.15,.2))
 yy <- 'y100'
 offset <- 0.48
-plot(pdf.rl$bma[[yy]]$x, offset+pdf.rl$bma[[yy]]$y, type='l', xlim=c(1.5, 4), ylim=c(0, 4+offset),
+plot(pdf.rl$bma[[yy]]$x, offset+pdf.rl$bma[[yy]]$y, type='l', xlim=c(1.5, 4), ylim=c(0, 3.4+offset),
      lwd=2.5, lty=1, xlab='', ylab='', xaxs='i', yaxs='i', yaxt='n', axes=FALSE, col='black')
 lines(pdf.rl$time$bma[[yy]]$x, offset+pdf.rl$time$bma[[yy]]$y, col='darkorange3', lwd=2, lty=2)
 lines(pdf.rl$temperature$bma[[yy]]$x, offset+pdf.rl$temperature$bma[[yy]]$y, col='mediumslateblue', lwd=2, lty=2)
 lines(pdf.rl$sealevel$bma[[yy]]$x, offset+pdf.rl$sealevel$bma[[yy]]$y, col='mediumvioletred', lwd=2, lty=2)
-lines(pdf.rl$nao$bma[[yy]]$x, offset+pdf.rl$nao$bma[[yy]]$y, col='seagreen', lwd=2, lty=4)
+lines(pdf.rl$nao$bma[[yy]]$x, offset+pdf.rl$nao$bma[[yy]]$y, col='seagreen', lwd=2, lty=2)
 y1 = c(.41, .47)
 polygon(c(q.rl$time$bma[[yy]][c(1,1)], q.rl$time$bma[[yy]][c(5,5)]), c(y1,rev(y1)), col='orange1', border=NA)
 polygon(c(q.rl$time$bma[[yy]][c(2,2)], q.rl$time$bma[[yy]][c(4,4)]), c(y1,rev(y1)), col='darkorange2', border=NA)
@@ -285,9 +285,9 @@ lines(c(q.rl$bma[[yy]][3], q.rl$bma[[yy]][3]), y5, lwd=2.5, col='black')
 u <- par("usr")
 arrows(u[1], u[3], u[1], .99*u[4], code = 2, length=.15, xpd = TRUE)
 mtext('Probability density', side=2, line=1, cex=1);
-mtext(paste('100-year return level in',proj_years[1],'[m]'), side=1, line=2.4, cex=0.9);
-axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.05)
-legend(2.8, 3.7, c('Time','Temperature','Sea level','NAO','BMA'), lty=c(2,2,2,2,1), cex=1, bty='n', lwd=2,
+mtext(paste('100-year return level in',proj_years[1],'[m]'), side=1, line=2.3, cex=1);
+axis(1, at=seq(1, 4, .25), labels=c('1','','1.5','','2','','2.5','','3','','3.5','','4'), cex.axis=1.0)
+legend(2.8, 4, c('Time','Temperature','Sea level','NAO','BMA'), lty=c(2,2,2,2,1), cex=1, bty='n', lwd=2,
        col=c('darkorange3','mediumslateblue','mediumvioletred','seagreen','black'))
 dev.off()
 
