@@ -1,5 +1,7 @@
 ---
-# Extreme value models - covariates
+# An integration and assessment of multiple covariates of nonstationary storm surge statistical behavior by Bayesian model averaging
+
+These are the codes accompanying the article with the above title, in Advances in Statistical Climatology, Meteorology and Oceanography (ASCMO).
 
 Questions? Tony Wong <anthony.e.wong@colorado.edu>
 
